@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SessionCapture.Sample.DetailPage"
+             Title="Detail">
+    <VerticalStackLayout Spacing="12">
+        <Label Text="Detail page" Style="{StaticResource Heading}" />
+        <Label Text="Pushed page. Navigating here should produce one auto-capture step."
+               Style="{StaticResource Caption}" />
+        <Button Text="Back" Clicked="OnBackClicked" />
+    </VerticalStackLayout>
+</ContentPage>

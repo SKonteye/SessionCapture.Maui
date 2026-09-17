@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Lets a build narrow to one platform without hand-editing csproj files:
+         dotnet build -p:SessionCaptureTargets=net10.0-android -->
+    <SessionCaptureTargets Condition="'$(SessionCaptureTargets)' == ''">net10.0-android;net10.0-ios</SessionCaptureTargets>
+  </PropertyGroup>
+</Project>

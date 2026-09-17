@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SessionCapture.Sample.FormPage"
+             Title="Form">
+    <ScrollView>
+        <VerticalStackLayout Spacing="12">
+            <Label Text="Form page" Style="{StaticResource Heading}" />
+            <Label Text="Text entry here checks that the overlay does not block input and survives the keyboard."
+                   Style="{StaticResource Caption}" />
+            <Entry Placeholder="Type something" />
+            <Editor Placeholder="Multi-line notes" HeightRequest="120" />
+            <Button Text="Back" Clicked="OnBackClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
