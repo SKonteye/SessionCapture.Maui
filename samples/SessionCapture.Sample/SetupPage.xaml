@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<local:DocPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SessionCapture.Sample"
+             x:Class="SessionCapture.Sample.SetupPage"
+             Title="1. Setup">
+    <ScrollView>
+        <VerticalStackLayout Spacing="12">
+
+            <Label Text="1. Setup" Style="{StaticResource Heading}" />
+            <Label Style="{StaticResource Body}"
+                   Text="Register the library once in MauiProgram.cs. It wires up the overlay, the platform media-save service, and a lifecycle hook that attaches to your Shell at startup." />
+
+            <Label Text="Configure in code" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="using SessionCapture.Maui.Extensions;&#10;&#10;var builder = MauiApp.CreateBuilder();&#10;builder.UseMauiApp&lt;App&gt;();&#10;&#10;builder.UseSessionCapture(configure: options =&gt;&#10;{&#10;    options.Enabled = true;&#10;    options.AutoCaptureOnNavigation = true;&#10;    options.CaptureQuality = 80;&#10;    options.MaxSessionsRetained = 20;&#10;    options.MaxScreenshotsPerSession = 200;&#10;});" />
+            </Border>
+
+            <Border Style="{StaticResource NoteCard}">
+                <Label Style="{StaticResource NoteText}"
+                       Text="Use the named argument configure:. The first parameter of UseSessionCapture is an IConfiguration, so passing a lambda positionally will not compile." />
+            </Border>
+
+            <Label Text="Or bind from appsettings.json" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="builder.UseSessionCapture(&#10;    builder.Configuration.GetSection(&quot;Features:SessionCapture&quot;));&#10;&#10;// appsettings.json&#10;{&#10;  &quot;Features&quot;: {&#10;    &quot;SessionCapture&quot;: {&#10;      &quot;Enabled&quot;: true,&#10;      &quot;AutoCaptureOnNavigation&quot;: true,&#10;      &quot;CaptureQuality&quot;: 80&#10;    }&#10;  }&#10;}" />
+            </Border>
+
+            <Label Text="Options" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="&#8226; Enabled &#8212; master switch; when false every API is inert&#10;&#8226; AutoCaptureOnNavigation &#8212; screenshot on each navigation&#10;&#8226; CaptureQuality &#8212; JPEG quality, 1&#8211;100&#10;&#8226; MaxSessionsRetained &#8212; older sessions are purged&#10;&#8226; MaxScreenshotsPerSession &#8212; cap per session&#10;&#8226; StorageFolderName / GalleryAlbumName &#8212; names on disk" />
+
+            <Label Text="iOS also needs" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="&lt;!-- Platforms/iOS/Info.plist --&gt;&#10;&lt;key&gt;NSPhotoLibraryAddUsageDescription&lt;/key&gt;&#10;&lt;string&gt;Saves captured screenshots to your photos.&lt;/string&gt;" />
+            </Border>
+            <Label Style="{StaticResource Caption}"
+                   Text="Required only if you call SaveSessionToPhotosAsync. Android permissions ship with the library." />
+
+            <Border Style="{StaticResource DemoCard}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="LIVE &#8212; this app's own registration" Style="{StaticResource DemoLabel}" />
+                    <Label x:Name="ResultLabel" Style="{StaticResource Mono}" />
+                    <Button Text="Check registration" Clicked="OnCheckClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</local:DocPage>

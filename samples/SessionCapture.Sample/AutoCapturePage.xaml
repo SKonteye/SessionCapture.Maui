@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<local:DocPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SessionCapture.Sample"
+             x:Class="SessionCapture.Sample.AutoCapturePage"
+             Title="4. Auto-capture">
+    <ScrollView>
+        <VerticalStackLayout Spacing="12">
+
+            <Label Text="4. Auto-capture" Style="{StaticResource Heading}" />
+            <Label Style="{StaticResource Body}"
+                   Text="With AutoCaptureOnNavigation enabled, the library subscribes to Shell.Navigated and records a step each time the user lands on a new page." />
+
+            <Label Text="How it attaches" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="// Done for you at startup by the lifecycle hook:&#10;capture.AttachToShell();    // subscribes Shell.Navigated&#10;capture.DetachFromShell();  // unsubscribes, hides overlay" />
+            </Border>
+            <Label Style="{StaticResource Caption}"
+                   Text="You only call these yourself if you replace the root page and want to re-attach manually." />
+
+            <Label Text="Requirements" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="&#8226; The root page must be a Shell &#8212; AttachToShell returns early if Shell.Current is null&#10;&#8226; A session must be active&#10;&#8226; AutoCaptureOnNavigation must be true&#10;&#8226; The session must be under MaxScreenshotsPerSession" />
+
+            <Border Style="{StaticResource NoteCard}">
+                <Label Style="{StaticResource NoteText}"
+                       Text="Known issue: each navigation waits 500ms before capturing, and a new navigation cancels the one still waiting. Moving quickly between pages therefore records fewer steps than pages visited, and can record none at all." />
+            </Border>
+
+            <Label Text="Try it" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="Start a session on page 2, then use the flyout to move between pages, pausing about a second on each. Come back here and press refresh to see how many steps were recorded." />
+
+            <Border Style="{StaticResource DemoCard}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="LIVE &#8212; auto-capture counter" Style="{StaticResource DemoLabel}" />
+                    <Label x:Name="ResultLabel" Style="{StaticResource Mono}" />
+                    <Button Text="Refresh counts" Clicked="OnRefreshClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</local:DocPage>

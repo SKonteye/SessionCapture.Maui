@@ -3,18 +3,36 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:local="clr-namespace:SessionCapture.Sample"
        x:Class="SessionCapture.Sample.AppShell"
-       Shell.FlyoutBehavior="Disabled">
+       Shell.FlyoutBehavior="Flyout"
+       Title="SessionCapture">
 
-    <TabBar>
-        <ShellContent Title="Home"
-                      ContentTemplate="{DataTemplate local:MainPage}"
-                      Route="main" />
-        <ShellContent Title="Form"
-                      ContentTemplate="{DataTemplate local:FormPage}"
-                      Route="form" />
-        <ShellContent Title="Sessions"
-                      ContentTemplate="{DataTemplate local:SessionsPage}"
-                      Route="sessions" />
-    </TabBar>
+    <ShellContent Title="Overview"
+                  Icon="{OnPlatform iOS='house', Android='house'}"
+                  ContentTemplate="{DataTemplate local:OverviewPage}"
+                  Route="overview" />
+
+    <ShellContent Title="1. Setup"
+                  ContentTemplate="{DataTemplate local:SetupPage}"
+                  Route="setup" />
+
+    <ShellContent Title="2. Sessions"
+                  ContentTemplate="{DataTemplate local:SessionsDocPage}"
+                  Route="sessions-doc" />
+
+    <ShellContent Title="3. Capturing"
+                  ContentTemplate="{DataTemplate local:CapturingPage}"
+                  Route="capturing" />
+
+    <ShellContent Title="4. Auto-capture"
+                  ContentTemplate="{DataTemplate local:AutoCapturePage}"
+                  Route="auto-capture" />
+
+    <ShellContent Title="5. Export"
+                  ContentTemplate="{DataTemplate local:ExportPage}"
+                  Route="export" />
+
+    <ShellContent Title="Stored sessions"
+                  ContentTemplate="{DataTemplate local:StoredSessionsPage}"
+                  Route="stored" />
 
 </Shell>

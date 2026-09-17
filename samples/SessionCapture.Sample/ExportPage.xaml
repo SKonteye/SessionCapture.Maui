@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<local:DocPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SessionCapture.Sample"
+             x:Class="SessionCapture.Sample.ExportPage"
+             Title="5. Export">
+    <ScrollView>
+        <VerticalStackLayout Spacing="12">
+
+            <Label Text="5. Export" Style="{StaticResource Heading}" />
+            <Label Style="{StaticResource Body}"
+                   Text="Finished sessions can be zipped, shared through the native sheet, or written into the device photo gallery." />
+
+            <Label Text="Reading sessions back" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="var all = await capture.GetAllSessionsAsync();&#10;var one = await capture.GetSessionAsync(id);&#10;&#10;await capture.DeleteSessionAsync(id);&#10;await capture.DeleteAllSessionsAsync();" />
+            </Border>
+
+            <Label Text="ZIP export" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="string? zipPath =&#10;    await capture.ExportSessionAsZipAsync(sessionId);&#10;&#10;// Contains session.json plus every step_NNN_*.jpg" />
+            </Border>
+
+            <Label Text="Native share" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="await capture.ShareSessionAsync(sessionId);&#10;// Zips, then opens the platform share sheet" />
+            </Border>
+
+            <Label Text="Save to the gallery" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="await capture.SaveSessionToPhotosAsync(sessionId);&#10;// Writes every screenshot into an album named&#10;// by options.GalleryAlbumName" />
+            </Border>
+            <Label Style="{StaticResource Caption}"
+                   Text="iOS needs NSPhotoLibraryAddUsageDescription in Info.plist. Android permissions ship with the library." />
+
+            <Label Text="Where files live" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="FileSystem.AppDataDirectory/&#10;  SessionCapture/&#10;    index.json&#10;    session_&lt;id&gt;/&#10;      session.json&#10;      step_001_HomePage.jpg&#10;      step_002_FormPage.jpg" />
+            </Border>
+
+            <Border Style="{StaticResource DemoCard}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="LIVE &#8212; export the newest session" Style="{StaticResource DemoLabel}" />
+                    <Label x:Name="ResultLabel" Style="{StaticResource Mono}" />
+                    <Button Text="Export as ZIP" Clicked="OnExportClicked" />
+                    <Button Text="Share" Clicked="OnShareClicked" />
+                    <Button Text="Save to photos" Clicked="OnSaveClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</local:DocPage>

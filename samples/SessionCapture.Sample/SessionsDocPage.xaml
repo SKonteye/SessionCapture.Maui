@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<local:DocPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SessionCapture.Sample"
+             x:Class="SessionCapture.Sample.SessionsDocPage"
+             Title="2. Sessions">
+    <ScrollView>
+        <VerticalStackLayout Spacing="12">
+
+            <Label Text="2. Sessions" Style="{StaticResource Heading}" />
+            <Label Style="{StaticResource Body}"
+                   Text="A session is one recording: a name, a tester, device metadata, and an ordered list of captured steps. Only one session can be active at a time." />
+
+            <Label Text="Starting and stopping" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="var capture = services&#10;    .GetRequiredService&lt;ISessionCaptureService&gt;();&#10;&#10;// Both arguments are optional.&#10;var session = await capture.StartSessionAsync(&#10;    sessionName: &quot;Checkout regression&quot;,&#10;    testerName: &quot;QA Tester&quot;);&#10;&#10;var finished = await capture.StopSessionAsync();&#10;Console.WriteLine(finished.StepCount);" />
+            </Border>
+
+            <Border Style="{StaticResource NoteCard}">
+                <Label Style="{StaticResource NoteText}"
+                       Text="StartSessionAsync throws if a session is already active, and StopSessionAsync throws if none is. Check IsSessionActive first, or handle InvalidOperationException." />
+            </Border>
+
+            <Label Text="Tester name" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="If you do not pass testerName, the overlay prompts for it once on the first session and remembers it in Preferences for later sessions." />
+
+            <Label Text="Reacting to events" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="capture.SessionStarted += (s, session) =&gt;&#10;    Log($&quot;started {session.Name}&quot;);&#10;&#10;capture.StepCaptured += (s, step) =&gt;&#10;    Log($&quot;step {step.StepNumber}: {step.PageName}&quot;);&#10;&#10;capture.SessionStopped += (s, session) =&gt;&#10;    Log($&quot;stopped, {session.StepCount} steps&quot;);" />
+            </Border>
+            <Label Style="{StaticResource Caption}"
+                   Text="Events may arrive off the UI thread. Marshal with MainThread.BeginInvokeOnMainThread before touching controls." />
+
+            <Border Style="{StaticResource DemoCard}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="LIVE &#8212; start or stop a session" Style="{StaticResource DemoLabel}" />
+                    <Label x:Name="ResultLabel" Style="{StaticResource Mono}" />
+                    <Button Text="Start session" Clicked="OnStartClicked" />
+                    <Button Text="Stop session" Clicked="OnStopClicked" Style="{StaticResource DangerButton}" />
+                    <Label Style="{StaticResource Caption}"
+                           Text="Start one, then open the flyout and move between pages to see auto-capture on page 4." />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</local:DocPage>

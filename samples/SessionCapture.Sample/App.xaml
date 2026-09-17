@@ -60,6 +60,64 @@
                 <Setter Property="StrokeShape" Value="RoundRectangle 10" />
             </Style>
 
+            <!-- Documentation styles -->
+
+            <Color x:Key="CodeBg">#1E1E2E</Color>
+            <Color x:Key="CodeFg">#E4E4EF</Color>
+            <Color x:Key="NoteBg">#FFF4E5</Color>
+            <Color x:Key="NoteAccent">#B26A00</Color>
+
+            <Style x:Key="CodeBlock" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CodeBg}" />
+                <Setter Property="Padding" Value="14" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+            </Style>
+
+            <Style x:Key="Code" TargetType="Label">
+                <Setter Property="FontFamily" Value="Courier New" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="TextColor" Value="{StaticResource CodeFg}" />
+                <Setter Property="LineHeight" Value="1.35" />
+            </Style>
+
+            <Style x:Key="SectionTitle" TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Margin" Value="0,10,0,2" />
+            </Style>
+
+            <Style x:Key="Body" TargetType="Label">
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="LineHeight" Value="1.4" />
+            </Style>
+
+            <Style x:Key="NoteCard" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource NoteBg}" />
+                <Setter Property="Padding" Value="12" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+            </Style>
+
+            <Style x:Key="NoteText" TargetType="Label">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="TextColor" Value="{StaticResource NoteAccent}" />
+                <Setter Property="LineHeight" Value="1.35" />
+            </Style>
+
+            <Style x:Key="DemoCard" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="#EEF0FF" />
+                <Setter Property="Padding" Value="14" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+            </Style>
+
+            <Style x:Key="DemoLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource Primary}" />
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

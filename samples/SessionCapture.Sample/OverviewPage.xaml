@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<local:DocPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SessionCapture.Sample"
+             x:Class="SessionCapture.Sample.OverviewPage"
+             Title="Overview">
+    <ScrollView>
+        <VerticalStackLayout Spacing="12">
+
+            <Label Text="SessionCapture.Maui" Style="{StaticResource Heading}" />
+            <Label Style="{StaticResource Body}"
+                   Text="A .NET MAUI library that records what a tester saw: it watches navigation, takes screenshots, and stores them as reviewable sessions on the device." />
+
+            <Label Text="What it gives you" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="&#8226; A floating overlay button to start, stop and capture&#10;&#8226; Automatic screenshots when the user navigates&#10;&#8226; Manual captures, optionally with a note&#10;&#8226; Local storage with a JSON index per session&#10;&#8226; Export as ZIP, native share, or save to the photo gallery" />
+
+            <Label Text="How this app is organised" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="Each page covers one concept, shows the exact code, and gives you a live control that calls the real library. Open the flyout to move between them." />
+
+            <Border Style="{StaticResource NoteCard}">
+                <Label Style="{StaticResource NoteText}"
+                       Text="Moving between these pages is itself the auto-capture demo. Start a session on page 2, then navigate: each page change should record a step." />
+            </Border>
+
+            <Label Text="Supported platforms" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="Android 26+ and iOS 15+. The overlay and gallery save are implemented natively per platform; everything else is shared code." />
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Live state" Style="{StaticResource DemoLabel}" />
+                    <Label x:Name="StateLabel" Style="{StaticResource Mono}" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</local:DocPage>

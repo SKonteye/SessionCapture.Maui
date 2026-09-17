@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<local:DocPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SessionCapture.Sample"
+             x:Class="SessionCapture.Sample.CapturingPage"
+             Title="3. Capturing">
+    <ScrollView>
+        <VerticalStackLayout Spacing="12">
+
+            <Label Text="3. Capturing" Style="{StaticResource Heading}" />
+            <Label Style="{StaticResource Body}"
+                   Text="Each capture hides the overlay, screenshots the screen, compresses to JPEG and appends a step to the active session. The overlay never appears in its own screenshots." />
+
+            <Label Text="Manual capture" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="await capture.CaptureScreenshotAsync(&#10;    pageName: nameof(CheckoutPage),&#10;    viewModelName: nameof(CheckoutViewModel),&#10;    type: CaptureStepType.ManualCapture);" />
+            </Border>
+
+            <Label Text="Capture with a note" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="await capture.CaptureWithNoteAsync(&#10;    pageName: nameof(CheckoutPage),&#10;    viewModelName: nameof(CheckoutViewModel),&#10;    note: &quot;Total is wrong when a coupon applies&quot;);" />
+            </Border>
+            <Label Style="{StaticResource Caption}"
+                   Text="The note is stored on the step as UserNote and appears in the exported JSON." />
+
+            <Label Text="Step types" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="&#8226; AutoNavigation (0) &#8212; recorded by the navigation hook&#10;&#8226; ManualCapture (1) &#8212; the tester pressed capture&#10;&#8226; Annotated (2) &#8212; captured together with a note" />
+
+            <Label Text="What a step holds" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="public sealed class CapturedStep&#10;{&#10;    public int StepNumber { get; set; }&#10;    public DateTime CapturedAt { get; set; }&#10;    public string PageName { get; set; }&#10;    public string ViewModelName { get; set; }&#10;    public string ScreenshotFileName { get; set; }&#10;    public string? UserNote { get; set; }&#10;    public CaptureStepType Type { get; set; }&#10;}" />
+            </Border>
+
+            <Border Style="{StaticResource NoteCard}">
+                <Label Style="{StaticResource NoteText}"
+                       Text="Captures are ignored when no session is active. Start one on page 2 first, or the buttons below will report that nothing happened." />
+            </Border>
+
+            <Border Style="{StaticResource DemoCard}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="LIVE &#8212; capture this page" Style="{StaticResource DemoLabel}" />
+                    <Label x:Name="ResultLabel" Style="{StaticResource Mono}" />
+                    <Button Text="Manual capture" Clicked="OnCaptureClicked" />
+                    <Button Text="Capture with note" Clicked="OnNoteClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</local:DocPage>

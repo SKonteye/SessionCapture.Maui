@@ -18,12 +18,12 @@
        wise pull samples/** into the shipped assembly. Keep them out. -->
 
   <ItemGroup>
-    <Compile Remove="samples/**" />
-    <None Remove="samples/**" />
-    <MauiXaml Remove="samples/**" />
-    <EmbeddedResource Remove="samples/**" />
-    <AndroidResource Remove="samples/**" />
-    <BundleResource Remove="samples/**" />
+    <Compile Remove="samples/**;tests/**" />
+    <None Remove="samples/**;tests/**" />
+    <MauiXaml Remove="samples/**;tests/**" />
+    <EmbeddedResource Remove="samples/**;tests/**" />
+    <AndroidResource Remove="samples/**;tests/**" />
+    <BundleResource Remove="samples/**;tests/**" />
   </ItemGroup>
 
   <ItemGroup>
