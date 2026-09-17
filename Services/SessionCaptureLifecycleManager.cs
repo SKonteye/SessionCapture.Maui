@@ -9,6 +9,8 @@ internal sealed class SessionCaptureLifecycleManager : IDisposable
     private readonly ISessionCaptureService _sessionCaptureService;
     private readonly SessionCaptureOptions _options;
     private Application? _application;
+    private Window? _trackedWindow;
+    private Page? _trackedPage;
     private Shell? _trackedShell;
     private bool _started;
 
@@ -46,15 +48,55 @@ internal sealed class SessionCaptureLifecycleManager : IDisposable
             _application.PropertyChanged -= OnApplicationPropertyChanged;
         }
 
+        TrackWindow(null);
         _sessionCaptureService.DetachFromShell();
+        _trackedPage = null;
         _trackedShell = null;
     }
 
     private void OnApplicationPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(Application.MainPage))
+        // Windows changing means a new window may need its Page tracked; the
+        // obsolete MainPage is still honoured for apps that set it.
+        if (e.PropertyName == nameof(Application.Windows) ||
+            e.PropertyName == "MainPage")
         {
             RefreshShellAttachment();
+        }
+    }
+
+    private void OnWindowPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Assigning Windows[0].Page raises this rather than any MainPage
+        // notification, so this is what actually fires when an app swaps its
+        // root page (login -> shell, onboarding -> app).
+        if (e.PropertyName == nameof(Window.Page))
+        {
+            RefreshShellAttachment();
+        }
+    }
+
+    /// <summary>
+    /// Keeps the PropertyChanged subscription pointed at the current window, so
+    /// a later root-page swap is noticed.
+    /// </summary>
+    private void TrackWindow(Window? window)
+    {
+        if (ReferenceEquals(window, _trackedWindow))
+        {
+            return;
+        }
+
+        if (_trackedWindow != null)
+        {
+            _trackedWindow.PropertyChanged -= OnWindowPropertyChanged;
+        }
+
+        _trackedWindow = window;
+
+        if (_trackedWindow != null)
+        {
+            _trackedWindow.PropertyChanged += OnWindowPropertyChanged;
         }
     }
 
@@ -63,22 +105,39 @@ internal sealed class SessionCaptureLifecycleManager : IDisposable
         if (!_options.Enabled)
         {
             _sessionCaptureService.DetachFromShell();
+            _trackedPage = null;
             _trackedShell = null;
             return;
         }
 
-        var shell = FindShell(ApplicationPageResolver.TryGetMainPage());
-        if (ReferenceEquals(shell, _trackedShell))
+        var window = Application.Current?.Windows.FirstOrDefault();
+        TrackWindow(window);
+
+        var page = window?.Page;
+        var shell = FindShell(page);
+
+        // Compare on the root page, not the Shell: two different non-Shell roots
+        // both resolve to a null Shell, and comparing those would skip the
+        // re-attach the second page needs for its overlay.
+        if (ReferenceEquals(page, _trackedPage) && ReferenceEquals(shell, _trackedShell))
         {
             return;
         }
 
-        _sessionCaptureService.DetachFromShell();
+        _trackedPage = page;
         _trackedShell = shell;
 
-        if (shell != null)
+        // Attach for any root page: the overlay works without a Shell, and
+        // AttachToShell hooks navigation only when one is present. AttachToShell
+        // unhooks the previous root itself, without ending an active session, so
+        // a swap mid-recording keeps recording.
+        if (page != null)
         {
             _sessionCaptureService.AttachToShell();
+        }
+        else
+        {
+            _sessionCaptureService.DetachFromShell();
         }
     }
 

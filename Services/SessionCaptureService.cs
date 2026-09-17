@@ -180,21 +180,40 @@ public sealed class SessionCaptureService : ISessionCaptureService
             return;
         }
 
-        DetachFromShell();
+        // Unhook without ending the session: re-attaching after a root-page swap
+        // must not discard a recording that is in progress.
+        UnhookShell();
 
+        // A Shell is needed to hook navigation, but not to show the overlay or
+        // capture manually. Apps with a plain page root still get a working
+        // capture button; only auto-capture requires Shell.
         var shell = Shell.Current;
-        if (shell == null)
+        if (shell != null)
         {
-            return;
+            _attachedShell = shell;
+            _attachedShell.Navigated += OnShellNavigated;
         }
 
-        _attachedShell = shell;
-        _attachedShell.Navigated += OnShellNavigated;
         _overlayService.ShowOverlay(this);
         _overlayService.UpdateState(IsSessionActive, _currentSession?.StepCount ?? 0);
     }
 
     public void DetachFromShell()
+    {
+        UnhookShell();
+
+        if (IsSessionActive)
+        {
+            _ = CloseSessionSilentlyAsync();
+        }
+    }
+
+    /// <summary>
+    /// Removes the navigation hook and hides the overlay, leaving any active
+    /// session running. Used when re-attaching to a new root page, where ending
+    /// the recording would lose the tester's work.
+    /// </summary>
+    private void UnhookShell()
     {
         if (_attachedShell != null)
         {
@@ -203,11 +222,6 @@ public sealed class SessionCaptureService : ISessionCaptureService
         }
 
         _overlayService.HideOverlay();
-
-        if (IsSessionActive)
-        {
-            _ = CloseSessionSilentlyAsync();
-        }
     }
 
     public async Task CaptureScreenshotAsync(
