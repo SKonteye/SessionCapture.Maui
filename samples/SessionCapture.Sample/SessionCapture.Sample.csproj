@@ -23,7 +23,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-    <!-- Matches the version the library pins, so the sample resolves one MAUI. -->
+    <!-- Matches the library's 10.0.30 floor. Required, not cosmetic: on the
+         workload's default 10.0.20 this app crashes at startup inside
+         MauiCALayer.Dispose. See the note in SessionCapture.Maui.csproj. -->
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.30" />
   </ItemGroup>
 

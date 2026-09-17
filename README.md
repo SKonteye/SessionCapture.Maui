@@ -1,20 +1,73 @@
 # SessionCapture.Maui
 
-Reusable .NET MAUI session capture library for Android and iOS.
+Records what a tester saw. A floating overlay button starts a session, and from
+then on the library screenshots every page the user navigates to, stores the
+run as reviewable JSON plus JPEGs on the device, and exports it as a ZIP.
 
-## Host setup
+Built for the gap between "it's broken on my phone" and a reproducible bug
+report.
 
-1. Add the NuGet package.
-2. Register it from `MauiProgram.cs`:
+- **Platforms:** Android 26+ and iOS 15+
+- **Requires:** .NET 10 / .NET MAUI
+- **License:** MIT
+
+## Install
+
+```
+dotnet add package SessionCapture.Maui
+```
+
+### If you get NU1605
+
+This package requires **Microsoft.Maui.Controls 10.0.30 or newer**. If your MAUI
+workload still generates apps on 10.0.20 you will see:
+
+```
+error NU1605: Detected package downgrade: Microsoft.Maui.Controls from 10.0.30 to 10.0.20
+```
+
+Set `MauiVersion` in your app's `.csproj` — the MAUI SDK already references
+`Microsoft.Maui.Controls` as `$(MauiVersion)`, so overriding the property is
+what works. Adding a second `PackageReference` does not:
+
+```xml
+<PropertyGroup>
+  <MauiVersion>10.0.30</MauiVersion>
+</PropertyGroup>
+```
+
+The floor is not arbitrary: on 10.0.20 an iOS app crashes at startup with a
+`NullReferenceException` in `MauiCALayer.Dispose`, a MAUI bug fixed in 10.0.30.
+
+## Setup
+
+Register it in `MauiProgram.cs`. **`Enabled` defaults to `false`**, so the
+library stays completely inert until you turn it on — set it explicitly or you
+will see nothing at runtime.
 
 ```csharp
 using SessionCapture.Maui.Extensions;
 
+builder.UseSessionCapture(configure: options =>
+{
+    options.Enabled = true;
+    options.AutoCaptureOnNavigation = true;
+    options.CaptureQuality = 80;
+    options.MaxSessionsRetained = 20;
+    options.MaxScreenshotsPerSession = 200;
+});
+```
+
+> `configure:` must be a **named argument** — the first parameter of
+> `UseSessionCapture` is an `IConfiguration`, so passing the lambda positionally
+> will not compile.
+
+Or bind from configuration:
+
+```csharp
 builder.UseSessionCapture(
     builder.Configuration.GetSection("Features:SessionCapture"));
 ```
-
-3. Add configuration:
 
 ```json
 {
@@ -30,8 +83,77 @@ builder.UseSessionCapture(
 }
 ```
 
-## Notes
+That is the whole setup. The overlay button appears on its own, and navigation
+is hooked automatically — you do not call `AttachToShell` yourself.
 
-- Tester name is prompted once on first session start and persisted in `Preferences`.
-- iOS hosts must provide `NSPhotoLibraryAddUsageDescription` in `Info.plist` if they use gallery export.
-- Android permissions are declared by the library for media save support.
+## Options
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `Enabled` | `false` | Master switch. Nothing runs until this is `true`. |
+| `AutoCaptureOnNavigation` | `true` | Screenshot each page the user navigates to. |
+| `CaptureQuality` | `80` | JPEG quality, 0–100. |
+| `MaxSessionsRetained` | `20` | Oldest sessions are pruned beyond this. |
+| `MaxScreenshotsPerSession` | `200` | Auto-capture stops at this many steps. |
+| `StorageFolderName` | `SessionCapture` | Folder under the app data directory. |
+| `GalleryAlbumName` | `SessionCapture` | Album used by gallery export. |
+
+## Capturing from code
+
+Inject `ISessionCaptureService` anywhere you need it.
+
+```csharp
+public class CheckoutViewModel(ISessionCaptureService capture)
+{
+    public Task ReportProblemAsync() =>
+        capture.CaptureWithNoteAsync(
+            pageName: nameof(CheckoutPage),
+            viewModelName: nameof(CheckoutViewModel),
+            note: "Total is wrong when a coupon applies");
+}
+```
+
+Sessions:
+
+```csharp
+await capture.StartSessionAsync("Login flow", "Sam");
+await capture.StopSessionAsync();
+
+var sessions = await capture.GetAllSessionsAsync();
+var zipPath  = await capture.ExportSessionAsZipAsync(sessionId);
+await capture.ShareSessionAsync(sessionId);      // native share sheet
+await capture.SaveSessionToPhotosAsync(sessionId);
+```
+
+Events: `StepCaptured`, `SessionStarted`, `SessionStopped`.
+
+## What gets stored
+
+Each session is a folder under the app data directory containing one JPEG per
+step and a `session.json`. Steps are numbered in the order the tester visited
+the pages, and each records the page name, the binding context type, a UTC
+timestamp, the step type (`AutoNavigation`, `ManualCapture`, `Annotated`) and
+any note.
+
+The overlay never appears in its own screenshots.
+
+## Platform notes
+
+- **Auto-capture requires Shell.** Apps with a plain page root still get the
+  overlay and manual capture; only navigation hooking needs `Shell`.
+- **iOS:** add `NSPhotoLibraryAddUsageDescription` to `Info.plist` if you use
+  gallery export.
+- **Android:** the library declares its own media permissions.
+
+## Sample
+
+`samples/SessionCapture.Sample` is a documentation app: seven pages, each
+explaining one concept with the exact code and a live control that calls the
+real library.
+
+## Status
+
+Verified on the iOS 26.5 simulator: sessions record, screenshots are written,
+rapid navigation captures every page, and the library survives a root-page
+swap. Android compiles and packages correctly but has not yet been exercised
+on a device or emulator.
