@@ -20,6 +20,14 @@ public partial class MainPage : ContentPage
 
         _capture = ServiceHelper.GetService<ISessionCaptureService>();
 
+        // Temporary diagnostic: does the library's Navigated subscription fire?
+        if (Shell.Current is { } shell)
+        {
+            shell.Navigated -= OnProbeNavigated;
+            shell.Navigated += OnProbeNavigated;
+            Append($"probe attached to Shell #{shell.GetHashCode()}");
+        }
+
         if (_capture == null)
         {
             Append("FAIL: ISessionCaptureService not resolvable.");
@@ -44,6 +52,25 @@ public partial class MainPage : ContentPage
             _capture.SessionStopped -= OnSessionStopped;
             _capture.StepCaptured -= OnStepCaptured;
         }
+    }
+
+    private void OnProbeNavigated(object? sender, ShellNavigatedEventArgs e)
+    {
+        // Written to disk so the count of Navigated events per user-visible
+        // navigation can be read back without driving the simulator UI.
+        try
+        {
+            File.AppendAllText(
+                Path.Combine(FileSystem.AppDataDirectory, "probe.log"),
+                $"{DateTime.UtcNow:HH:mm:ss.fff} Navigated loc={e.Current?.Location} src={e.Source}\n");
+        }
+        catch
+        {
+            // diagnostic only
+        }
+
+        MainThread.BeginInvokeOnMainThread(() =>
+            Append($"PROBE Navigated: {e.Current?.Location} (src {e.Source})"));
     }
 
     private void OnSessionStarted(object? sender, CapturedSession e)
