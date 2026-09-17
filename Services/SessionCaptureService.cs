@@ -24,7 +24,14 @@ public sealed class SessionCaptureService : ISessionCaptureService
     private CapturedSession? _currentSession;
     private string? _currentSessionFolder;
     private Shell? _attachedShell;
-    private CancellationTokenSource? _captureCts;
+
+    /// <summary>
+    /// Scoped to the session, not to a single navigation. Ending a session
+    /// cancels it so in-flight captures are abandoned; each navigation links its
+    /// own token to this one rather than replacing it, so that navigating does
+    /// not destroy the capture a previous navigation is still waiting to take.
+    /// </summary>
+    private CancellationTokenSource _sessionCts = new();
     private bool _autoCaptureMaxReached;
 
     public SessionCaptureService(
@@ -66,7 +73,7 @@ public sealed class SessionCaptureService : ISessionCaptureService
     {
         EnsureEnabled();
 
-        _captureCts?.Cancel();
+        ResetSessionToken();
         _autoCaptureMaxReached = false;
 
         var session = new CapturedSession
@@ -122,7 +129,7 @@ public sealed class SessionCaptureService : ISessionCaptureService
                 throw new InvalidOperationException("No active capture session to stop.");
             }
 
-            _captureCts?.Cancel();
+            _sessionCts.Cancel();
             _currentSession.EndedAt = DateTime.UtcNow;
             await SaveSessionJsonUnsafeAsync();
             await UpdateIndexUnsafeAsync(_currentSession);
@@ -152,7 +159,7 @@ public sealed class SessionCaptureService : ISessionCaptureService
                 return;
             }
 
-            _captureCts?.Cancel();
+            _sessionCts.Cancel();
             _currentSession.EndedAt = DateTime.UtcNow;
             await SaveSessionJsonUnsafeAsync();
             await UpdateIndexUnsafeAsync(_currentSession);
@@ -487,6 +494,18 @@ public sealed class SessionCaptureService : ISessionCaptureService
         });
     }
 
+    /// <summary>
+    /// Cancels any capture still pending from a previous session and installs a
+    /// fresh token for the new one.
+    /// </summary>
+    private void ResetSessionToken()
+    {
+        var previous = _sessionCts;
+        _sessionCts = new CancellationTokenSource();
+        previous.Cancel();
+        previous.Dispose();
+    }
+
     private async void OnShellNavigated(object? sender, ShellNavigatedEventArgs e)
     {
         if (!IsSessionActive || !_options.AutoCaptureOnNavigation || _autoCaptureMaxReached)
@@ -494,9 +513,11 @@ public sealed class SessionCaptureService : ISessionCaptureService
             return;
         }
 
-        _captureCts?.Cancel();
-        _captureCts = new CancellationTokenSource();
-        var token = _captureCts.Token;
+        // Linked to the session rather than replacing a shared token: a second
+        // navigation must not cancel the capture the first one is still waiting
+        // to take, but ending the session must cancel both.
+        using var navigationCts = CancellationTokenSource.CreateLinkedTokenSource(_sessionCts.Token);
+        var token = navigationCts.Token;
 
         var page = Shell.Current?.CurrentPage;
         var pageName = page?.GetType().Name ?? "Unknown";
@@ -662,7 +683,10 @@ public sealed class SessionCaptureService : ISessionCaptureService
             token.ThrowIfCancellationRequested();
 
             var stepNumber = _currentSession.Steps.Count + 1;
-            var fileName = $"step_{stepNumber:D3}_{SanitizeFileName(pageName)}.jpg";
+
+            // Named by capture time rather than step number: concurrent captures
+            // are renumbered once they are all in, and a file name cannot follow.
+            var fileName = $"step_{capturedAt:HHmmssfff}_{SanitizeFileName(pageName)}.jpg";
             var filePath = Path.Combine(_currentSessionFolder, fileName);
 
             await File.WriteAllBytesAsync(filePath, compressedBytes, token);
@@ -678,7 +702,13 @@ public sealed class SessionCaptureService : ISessionCaptureService
                 Type = type
             };
 
-            _currentSession.Steps.Add(step);
+            // Auto-captures for different navigations run concurrently, so they
+            // can finish out of order. Insert by capture time and renumber, so
+            // StepNumber always reflects what the tester actually saw first.
+            var insertAt = _currentSession.Steps.FindLastIndex(s => s.CapturedAt <= capturedAt) + 1;
+            _currentSession.Steps.Insert(insertAt, step);
+            RenumberStepsUnsafe();
+
             await SaveSessionJsonUnsafeAsync();
         }
         finally
@@ -690,6 +720,23 @@ public sealed class SessionCaptureService : ISessionCaptureService
         {
             StepCaptured?.Invoke(this, step);
             _overlayService.UpdateState(true, _currentSession?.StepCount ?? step.StepNumber);
+        }
+    }
+
+    /// <summary>
+    /// Renumbers steps 1..n in their current (capture-time) order. Callers must
+    /// already hold <see cref="_storageLock"/>.
+    /// </summary>
+    private void RenumberStepsUnsafe()
+    {
+        if (_currentSession == null)
+        {
+            return;
+        }
+
+        for (var i = 0; i < _currentSession.Steps.Count; i++)
+        {
+            _currentSession.Steps[i].StepNumber = i + 1;
         }
     }
 

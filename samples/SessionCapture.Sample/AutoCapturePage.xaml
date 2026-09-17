@@ -25,12 +25,12 @@
 
             <Border Style="{StaticResource NoteCard}">
                 <Label Style="{StaticResource NoteText}"
-                       Text="Known issue: each navigation waits 500ms before capturing, and a new navigation cancels the one still waiting. Moving quickly between pages therefore records fewer steps than pages visited, and can record none at all." />
+                       Text="Each navigation waits 500ms before capturing, so the page has settled before the screenshot is taken. Navigations are independent: moving quickly between pages records every page, and steps are numbered in the order you visited them, not the order the screenshots finished." />
             </Border>
 
             <Label Text="Try it" Style="{StaticResource SectionTitle}" />
             <Label Style="{StaticResource Body}"
-                   Text="Start a session on page 2, then use the flyout to move between pages, pausing about a second on each. Come back here and press refresh to see how many steps were recorded." />
+                   Text="Start a session on page 2, then use the flyout to move between pages — as fast as you like. Come back here and press refresh: the step count should match the number of pages you visited." />
 
             <Border Style="{StaticResource DemoCard}">
                 <VerticalStackLayout Spacing="8">
