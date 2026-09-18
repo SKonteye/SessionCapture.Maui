@@ -15,6 +15,12 @@ report.
 - **Requires:** .NET 10 / .NET MAUI
 - **License:** MIT
 
+| The page the package ships | The sample documentation app |
+| --- | --- |
+| <img src="https://raw.githubusercontent.com/SKonteye/SessionCapture.Maui/main/docs/session-list.jpg" width="260" alt="The built-in session list: recorded sessions with step counts, timestamps and tester names, and buttons to reload or delete." /> | <img src="https://raw.githubusercontent.com/SKonteye/SessionCapture.Maui/main/docs/docs-app.jpg" width="260" alt="A page of the sample app showing the code needed to push the built-in review page." /> |
+
+Both shots were recorded by the library itself, running in the sample app.
+
 ## Install
 
 ```
