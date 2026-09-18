@@ -21,6 +21,9 @@ public class SessionDetailPage : ContentPage
     private readonly Label _device = new();
     private readonly Label _status = new();
     private readonly CollectionView _steps = new();
+    private readonly List<Button> _actions = new();
+
+    private bool _busy;
 
     /// <summary>Shows one stored session.</summary>
     /// <param name="capture">The capture service.</param>
@@ -69,6 +72,11 @@ public class SessionDetailPage : ContentPage
 
         var deleteButton = new Button { Text = "Delete this session" }.ThemedDanger();
         deleteButton.Clicked += OnDeleteClicked;
+
+        // Every action works on the same session folder, and the export deletes
+        // and recreates one temporary directory: two running at once would pull
+        // files out from under each other.
+        _actions.AddRange(new[] { exportButton, shareButton, saveButton, deleteButton });
 
         var header = new VerticalStackLayout
         {
@@ -229,6 +237,14 @@ public class SessionDetailPage : ContentPage
 
     private async void OnDeleteClicked(object? sender, EventArgs e)
     {
+        // Checked before the dialog, not just inside RunAsync: otherwise a tap
+        // during an in-flight export still prompts, and the tester confirms a
+        // delete that is then refused.
+        if (_busy)
+        {
+            return;
+        }
+
         var confirmed = await DisplayAlertAsync(
             "Delete session",
             "This removes the session and its screenshots from the device.",
@@ -255,6 +271,14 @@ public class SessionDetailPage : ContentPage
     /// </summary>
     private async Task RunAsync(Func<Task<string>> action)
     {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        SetActionsEnabled(false);
+
         try
         {
             _status.Text = await action();
@@ -262,6 +286,19 @@ public class SessionDetailPage : ContentPage
         catch (Exception ex)
         {
             _status.Text = $"{ex.GetType().Name}: {ex.Message}";
+        }
+        finally
+        {
+            _busy = false;
+            SetActionsEnabled(true);
+        }
+    }
+
+    private void SetActionsEnabled(bool enabled)
+    {
+        foreach (var button in _actions)
+        {
+            button.IsEnabled = enabled;
         }
     }
 }

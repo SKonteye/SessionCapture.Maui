@@ -197,8 +197,8 @@ StepList.ItemsSource = session.Steps
     .ToList();
 ```
 
-Handle the `null`: steps recorded by `CloseSessionSilentlyAsync`, which recovers
-a session the app never closed cleanly, carry no screenshot. Binding a `null`
+Handle the `null`: a session the app never closed cleanly is recovered at
+startup with a final marker step that carries no screenshot. Binding a `null`
 straight to an `Image` shows an empty box with no hint why.
 
 This is what `SessionCapturePage` does internally, so reach for it only when you

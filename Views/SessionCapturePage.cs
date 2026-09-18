@@ -23,7 +23,9 @@ namespace SessionCapture.Maui.Views;
 /// </remarks>
 public class SessionCapturePage : ContentPage
 {
-    private readonly ISessionCaptureService? _capture;
+    private readonly bool _resolveFromContainer;
+
+    private ISessionCaptureService? _capture;
 
     private readonly Label _status = new();
     private readonly CollectionView _sessions = new();
@@ -34,8 +36,18 @@ public class SessionCapturePage : ContentPage
     /// <c>UseSessionCapture</c>, which is the usual case.
     /// </summary>
     public SessionCapturePage()
-        : this(ApplicationServiceResolver.TryGetServices()?.GetService(typeof(ISessionCaptureService)) as ISessionCaptureService)
     {
+        // Resolved on appearing, not here: constructing the page during startup,
+        // as in new NavigationPage(new SessionCapturePage()), runs before
+        // Application.Current.Handler exists, and capturing null now would leave
+        // the page claiming UseSessionCapture was never called.
+        _resolveFromContainer = true;
+
+        Resources = SessionCaptureTheme.Build();
+        this.ThemedPage();
+        Title = "Sessions";
+
+        BuildLayout();
     }
 
     /// <summary>
@@ -46,6 +58,7 @@ public class SessionCapturePage : ContentPage
     public SessionCapturePage(ISessionCaptureService? capture)
     {
         _capture = capture;
+        _resolveFromContainer = false;
 
         Resources = SessionCaptureTheme.Build();
         this.ThemedPage();
@@ -153,6 +166,14 @@ public class SessionCapturePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        // The container is only reliably reachable once the page is attached.
+        if (_resolveFromContainer && _capture == null)
+        {
+            _capture = ApplicationServiceResolver.TryGetServices()
+                ?.GetService(typeof(ISessionCaptureService)) as ISessionCaptureService;
+        }
+
         await LoadAsync();
     }
 
@@ -189,13 +210,25 @@ public class SessionCapturePage : ContentPage
         // raises nothing.
         _sessions.SelectedItem = null;
 
-        if (Navigation == null)
+        // Navigation is never null -- MAUI hands back a proxy even with no host
+        // behind it -- so check for a real host instead, and still contain a
+        // failed push rather than letting it escape this async void handler into
+        // the consumer's app.
+        if (Shell.Current == null && Application.Current?.Windows
+                .Any(window => window.Page is NavigationPage) != true)
         {
-            _status.Text = "No navigation host: push SessionCapturePage inside a NavigationPage or Shell.";
+            _status.Text = "No navigation host: present SessionCapturePage inside a NavigationPage or Shell.";
             return;
         }
 
-        await Navigation.PushAsync(new SessionDetailPage(_capture, session.Id));
+        try
+        {
+            await Navigation.PushAsync(new SessionDetailPage(_capture, session.Id));
+        }
+        catch (Exception ex)
+        {
+            _status.Text = $"Could not open the session: {ex.Message}";
+        }
     }
 
     private async void OnDeleteAllClicked(object? sender, EventArgs e)

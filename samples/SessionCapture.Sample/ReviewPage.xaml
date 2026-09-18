@@ -37,7 +37,7 @@
 
             <Border Style="{StaticResource NoteCard}">
                 <Label Style="{StaticResource NoteText}"
-                       Text="It returns null when the step has no screenshot or the file is gone. Steps written by CloseSessionSilentlyAsync, which recovers a session the app never closed cleanly, have no screenshot. Always handle null rather than binding it straight through." />
+                       Text="It returns null when the step has no screenshot or the file is gone. A session the app never closed cleanly is recovered at startup with a final marker step that has no screenshot. Always handle null rather than binding it straight through." />
             </Border>
 
             <Label Text="What a step tells you" Style="{StaticResource SectionTitle}" />

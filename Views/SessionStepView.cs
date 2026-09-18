@@ -8,7 +8,7 @@ namespace SessionCapture.Maui.Views;
 /// a file name, so the screenshot path has to be resolved through the service
 /// before a template can show it.
 /// </summary>
-public sealed class SessionStepView
+internal sealed class SessionStepView
 {
     private SessionStepView(CapturedStep step, string? imagePath)
     {
@@ -53,7 +53,7 @@ public sealed class SessionStepView
     /// <summary>True when the screenshot is absent, so the UI can say so.</summary>
     public bool IsMissingImage => ImagePath == null;
 
-    internal static IReadOnlyList<SessionStepView> Project(
+    public static IReadOnlyList<SessionStepView> Project(
         ISessionCaptureService capture,
         CapturedSession session)
     {

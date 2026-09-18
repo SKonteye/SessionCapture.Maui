@@ -39,8 +39,9 @@ public interface ISessionCaptureService
     /// <param name="step">A step from that session.</param>
     /// <returns>
     /// The full path to the screenshot, or <c>null</c> when the step carries no
-    /// screenshot or the file is no longer on disk. Steps recorded by
-    /// <see cref="CloseSessionSilentlyAsync"/> have no screenshot.
+    /// screenshot or the file is no longer on disk. A session the app never
+    /// closed cleanly is recovered at startup with a final marker step that has
+    /// no screenshot, so always handle the <c>null</c>.
     /// </returns>
     string? GetStepImagePath(string sessionId, CapturedStep step);
 

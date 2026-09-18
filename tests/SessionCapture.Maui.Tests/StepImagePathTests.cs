@@ -12,7 +12,7 @@ namespace SessionCapture.Maui.Tests;
 ///   screenshot    -> {session folder}/{step.ScreenshotFileName}
 ///
 /// The case that matters: a step can legitimately carry an empty
-/// ScreenshotFileName. CloseSessionSilentlyAsync writes recovery steps that way
+/// ScreenshotFileName. RecoverOrphanedSessionsAsync writes marker steps that way
 /// (SessionCaptureService.cs:596). Combining that into a path yields the session
 /// folder itself, which is a directory -- so a caller binding it to an Image
 /// silently shows nothing instead of falling back to a placeholder. The resolver
@@ -75,7 +75,7 @@ public class StepImagePathTests
     [InlineData("   ")]
     public void Resolve_ReturnsNull_ForAStepWithNoScreenshot(string fileName)
     {
-        // CloseSessionSilentlyAsync writes recovery steps with an empty file name.
+        // RecoverOrphanedSessionsAsync writes marker steps with an empty file name.
         var path = StepImagePathResolver.Resolve(Root, "abc123", fileName);
 
         Assert.Null(path);

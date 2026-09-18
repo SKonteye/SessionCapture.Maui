@@ -382,8 +382,8 @@ public sealed class SessionCaptureService : ISessionCaptureService
 
         var sessionFolder = TryGetSessionFolder(sessionId);
 
-        // A step can legitimately have no screenshot: CloseSessionSilentlyAsync
-        // records recovery steps that way. Combining an empty name would yield
+        // A step can legitimately have no screenshot: RecoverOrphanedSessionsAsync
+        // marks an interrupted session that way. Combining an empty name would yield
         // the session folder, and binding a directory to an Image shows nothing
         // rather than failing, so return null and let the caller show a
         // placeholder.
