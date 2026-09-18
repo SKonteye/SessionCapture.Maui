@@ -31,6 +31,10 @@
                   ContentTemplate="{DataTemplate local:ExportPage}"
                   Route="export" />
 
+    <ShellContent Title="6. Review"
+                  ContentTemplate="{DataTemplate local:ReviewPage}"
+                  Route="review" />
+
     <ShellContent Title="Stored sessions"
                   ContentTemplate="{DataTemplate local:StoredSessionsPage}"
                   Route="stored" />

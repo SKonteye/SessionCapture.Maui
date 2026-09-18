@@ -336,6 +336,25 @@ public sealed class SessionCaptureService : ISessionCaptureService
         }
     }
 
+    public string? GetStepImagePath(string sessionId, CapturedStep step)
+    {
+        ArgumentNullException.ThrowIfNull(step);
+
+        // A step can legitimately have no screenshot: CloseSessionSilentlyAsync
+        // records recovery steps that way. Combining an empty name would yield
+        // the session folder, and binding a directory to an Image shows nothing
+        // rather than failing, so return null and let the caller show a
+        // placeholder.
+        if (string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(step.ScreenshotFileName))
+        {
+            return null;
+        }
+
+        var path = Path.Combine(_storageRoot, $"session_{sessionId}", step.ScreenshotFileName);
+
+        return File.Exists(path) ? path : null;
+    }
+
     public async Task DeleteSessionAsync(string sessionId)
     {
         await _storageLock.WaitAsync();

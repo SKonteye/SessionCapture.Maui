@@ -137,6 +137,48 @@ any note.
 
 The overlay never appears in its own screenshots.
 
+## Reviewing and replaying a session
+
+`CapturedStep` stores a file name, not a path. `GetStepImagePath` resolves it
+against the session folder so you can show the screenshot back to the tester.
+
+```csharp
+var session = await capture.GetSessionAsync(sessionId);
+
+foreach (var step in session.Steps.OrderBy(s => s.StepNumber))
+{
+    string? path = capture.GetStepImagePath(session.Id, step);
+
+    // null when the step has no screenshot, or the file is gone
+    var source = path is null ? null : ImageSource.FromFile(path);
+
+    Console.WriteLine($"{step.StepNumber}. {step.PageName} {step.UserNote}");
+}
+```
+
+Bound into a `CollectionView`, that is a scrollable replay of the run: every
+page the tester visited, in order, with the screenshot and any note they left.
+
+```csharp
+StepList.ItemsSource = session.Steps
+    .OrderBy(s => s.StepNumber)
+    .Select(s => new
+    {
+        s.StepNumber,
+        s.PageName,
+        s.UserNote,
+        ImagePath = capture.GetStepImagePath(session.Id, s)
+    })
+    .ToList();
+```
+
+Handle the `null`: steps recorded by `CloseSessionSilentlyAsync`, which recovers
+a session the app never closed cleanly, carry no screenshot. Binding a `null`
+straight to an `Image` shows an empty box with no hint why.
+
+The sample's **Stored sessions** page does exactly this — tap any session to see
+its steps, then export, share or delete it.
+
 ## Platform notes
 
 - **Auto-capture requires Shell.** Apps with a plain page root still get the
@@ -147,9 +189,10 @@ The overlay never appears in its own screenshots.
 
 ## Sample
 
-`samples/SessionCapture.Sample` is a documentation app: seven pages, each
+`samples/SessionCapture.Sample` is a documentation app: eight pages, each
 explaining one concept with the exact code and a live control that calls the
-real library.
+real library. **Stored sessions** goes further and reviews a recorded run:
+tap a session to page through its screenshots, notes and timings.
 
 ## Status
 

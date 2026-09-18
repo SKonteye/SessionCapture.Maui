@@ -1,3 +1,5 @@
+using SessionCapture.Maui.Models;
+
 namespace SessionCapture.Sample;
 
 public partial class StoredSessionsPage : DocPage
@@ -10,6 +12,20 @@ public partial class StoredSessionsPage : DocPage
     protected override async void OnCaptureReady() => await ReloadAsync();
 
     private async void OnReloadClicked(object? sender, EventArgs e) => await ReloadAsync();
+
+    private async void OnSessionSelected(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is not CapturedSession session)
+        {
+            return;
+        }
+
+        // Clear it, or coming back leaves the row selected and re-tapping it
+        // raises nothing.
+        SessionList.SelectedItem = null;
+
+        await Shell.Current.GoToAsync($"{nameof(SessionDetailPage)}?id={Uri.EscapeDataString(session.Id)}");
+    }
 
     private async void OnDeleteAllClicked(object? sender, EventArgs e)
     {

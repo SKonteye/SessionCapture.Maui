@@ -9,9 +9,11 @@
 
         <Label Grid.Row="0" Text="Stored sessions" Style="{StaticResource Heading}" />
         <Label Grid.Row="1" Style="{StaticResource Caption}"
-               Text="Everything GetAllSessionsAsync returns, newest first." />
+               Text="Everything GetAllSessionsAsync returns, newest first. Tap a session to review its steps." />
 
-        <CollectionView Grid.Row="2" x:Name="SessionList" Margin="0,6,0,0">
+        <CollectionView Grid.Row="2" x:Name="SessionList" Margin="0,6,0,0"
+                        SelectionMode="Single"
+                        SelectionChanged="OnSessionSelected">
             <CollectionView.EmptyView>
                 <Label Text="No sessions recorded yet." Style="{StaticResource Caption}" />
             </CollectionView.EmptyView>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<local:DocPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SessionCapture.Sample"
+             x:Class="SessionCapture.Sample.ReviewPage"
+             Title="6. Review">
+    <ScrollView>
+        <VerticalStackLayout Spacing="12">
+
+            <Label Text="6. Review" Style="{StaticResource Heading}" />
+            <Label Style="{StaticResource Body}"
+                   Text="A recorded session is only useful if someone can look at it. Read a session back, resolve each step's screenshot to a file, and show the run in order." />
+
+            <Label Text="Read the session back" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="var session = await capture.GetSessionAsync(id);&#10;&#10;// Steps are stored in capture order, but sort&#10;// explicitly if you depend on it.&#10;var steps = session.Steps&#10;    .OrderBy(s =&gt; s.StepNumber);" />
+            </Border>
+
+            <Label Text="Resolve a screenshot" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="CapturedStep carries a file name, not a path. GetStepImagePath turns it into something an Image can load." />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="string? path =&#10;    capture.GetStepImagePath(session.Id, step);&#10;&#10;image.Source = path == null&#10;    ? null&#10;    : ImageSource.FromFile(path);" />
+            </Border>
+
+            <Border Style="{StaticResource NoteCard}">
+                <Label Style="{StaticResource NoteText}"
+                       Text="It returns null when the step has no screenshot or the file is gone. Steps written by CloseSessionSilentlyAsync, which recovers a session the app never closed cleanly, have no screenshot. Always handle null rather than binding it straight through." />
+            </Border>
+
+            <Label Text="What a step tells you" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="step.StepNumber     // 1, 2, 3 ...&#10;step.PageName       // where the tester was&#10;step.ViewModelName  // if you supplied one&#10;step.CapturedAt     // when&#10;step.UserNote       // set by CaptureWithNoteAsync&#10;step.Type           // AutoNavigation | ManualCapture&#10;                    // | Annotated" />
+            </Border>
+
+            <Label Text="Building a review list" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="Flatten the steps into something bindable, resolving the path once rather than inside the template." />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="StepList.ItemsSource = session.Steps&#10;    .OrderBy(s =&gt; s.StepNumber)&#10;    .Select(s =&gt; new&#10;    {&#10;        s.StepNumber,&#10;        s.PageName,&#10;        s.UserNote,&#10;        ImagePath = capture&#10;            .GetStepImagePath(session.Id, s)&#10;    })&#10;    .ToList();" />
+            </Border>
+
+            <Label Text="Exporting what you reviewed" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="await capture.ExportSessionAsZipAsync(id);&#10;await capture.ShareSessionAsync(id);&#10;await capture.SaveSessionToPhotosAsync(id);" />
+            </Border>
+            <Label Style="{StaticResource Caption}"
+                   Text="Page 5 covers these in full." />
+
+            <Border Style="{StaticResource NoteCard}">
+                <Label Style="{StaticResource NoteText}"
+                       Text="Open 'Stored sessions' in the flyout and tap any row. That screen is this page's code running for real: metadata, every step with its screenshot, and the export actions." />
+            </Border>
+
+            <Border Style="{StaticResource DemoCard}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="LIVE &#8212; review the newest session" Style="{StaticResource DemoLabel}" />
+                    <Label x:Name="ResultLabel" Style="{StaticResource Mono}" />
+                    <Button Text="Open newest session" Clicked="OnOpenNewestClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</local:DocPage>

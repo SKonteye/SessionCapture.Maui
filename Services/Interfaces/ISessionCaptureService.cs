@@ -31,6 +31,19 @@ public interface ISessionCaptureService
 
     Task<CapturedSession?> GetSessionAsync(string sessionId);
 
+    /// <summary>
+    /// Resolves the on-disk path of a step's screenshot, for displaying a
+    /// recorded session back to the tester.
+    /// </summary>
+    /// <param name="sessionId">The session the step belongs to.</param>
+    /// <param name="step">A step from that session.</param>
+    /// <returns>
+    /// The full path to the screenshot, or <c>null</c> when the step carries no
+    /// screenshot or the file is no longer on disk. Steps recorded by
+    /// <see cref="CloseSessionSilentlyAsync"/> have no screenshot.
+    /// </returns>
+    string? GetStepImagePath(string sessionId, CapturedStep step);
+
     Task DeleteSessionAsync(string sessionId);
 
     Task DeleteAllSessionsAsync();

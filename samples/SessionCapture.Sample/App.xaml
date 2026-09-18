@@ -118,6 +118,36 @@
                 <Setter Property="TextColor" Value="{StaticResource Primary}" />
             </Style>
 
+            <!-- Session review styles -->
+
+            <Color x:Key="ThumbBg">#DDDDE3</Color>
+
+            <!-- Screenshots are portrait phone captures; 64x114 keeps that
+                 ratio so the thumbnail is not letterboxed in the step list. -->
+            <Style x:Key="StepThumb" TargetType="Image">
+                <Setter Property="WidthRequest" Value="64" />
+                <Setter Property="HeightRequest" Value="114" />
+                <Setter Property="Aspect" Value="AspectFit" />
+                <Setter Property="BackgroundColor" Value="{StaticResource ThumbBg}" />
+            </Style>
+
+            <Style x:Key="StepNumber" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource Primary}" />
+            </Style>
+
+            <Style x:Key="StepNote" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="{StaticResource NoteAccent}" />
+                <Setter Property="LineHeight" Value="1.3" />
+            </Style>
+
+            <Style x:Key="MetaRow" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="{StaticResource Muted}" />
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

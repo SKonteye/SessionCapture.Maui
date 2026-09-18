@@ -17,6 +17,14 @@
                        Text="var all = await capture.GetAllSessionsAsync();&#10;var one = await capture.GetSessionAsync(id);&#10;&#10;await capture.DeleteSessionAsync(id);&#10;await capture.DeleteAllSessionsAsync();" />
             </Border>
 
+            <Label Text="Showing a step's screenshot" Style="{StaticResource SectionTitle}" />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="string? path =&#10;    capture.GetStepImagePath(session.Id, step);&#10;&#10;// null when the step has no screenshot" />
+            </Border>
+            <Label Style="{StaticResource Caption}"
+                   Text="Page 6 covers reviewing and replaying a session on device." />
+
             <Label Text="ZIP export" Style="{StaticResource SectionTitle}" />
             <Border Style="{StaticResource CodeBlock}">
                 <Label Style="{StaticResource Code}"
