@@ -4,6 +4,10 @@ Records what a tester saw. A floating overlay button starts a session, and from
 then on the library screenshots every page the user navigates to, stores the
 run as reviewable JSON plus JPEGs on the device, and exports it as a ZIP.
 
+A built-in page then plays the session back — every screenshot in order, with
+the tester's notes — and exports it, so you ship the whole loop without writing
+any review UI.
+
 Built for the gap between "it's broken on my phone" and a reproducible bug
 report.
 
@@ -138,6 +142,27 @@ any note.
 The overlay never appears in its own screenshots.
 
 ## Reviewing and replaying a session
+
+The package ships the review screen, so you do not have to build one:
+
+```csharp
+using SessionCapture.Maui.Views;
+
+await Navigation.PushAsync(new SessionCapturePage());
+```
+
+That gives your testers the full loop: every recorded session, tap one to page
+through its screenshots with the notes and timings, then export it as a ZIP,
+share it, save it to the gallery, or delete it. It resolves the service from
+the app's container, so nothing else is needed as long as you called
+`UseSessionCapture`. Present it inside a `NavigationPage` or Shell — it pushes a
+detail page. Pass the service explicitly if you resolve your own dependencies:
+
+```csharp
+await Navigation.PushAsync(new SessionCapturePage(capture));
+```
+
+### Building your own instead
 
 `CapturedStep` stores a file name, not a path. `GetStepImagePath` resolves it
 against the session folder so you can show the screenshot back to the tester.

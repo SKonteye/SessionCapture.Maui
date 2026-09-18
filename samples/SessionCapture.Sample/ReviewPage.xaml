@@ -11,6 +11,16 @@
             <Label Style="{StaticResource Body}"
                    Text="A recorded session is only useful if someone can look at it. Read a session back, resolve each step's screenshot to a file, and show the run in order." />
 
+            <Label Text="The quickest route: the built-in page" Style="{StaticResource SectionTitle}" />
+            <Label Style="{StaticResource Body}"
+                   Text="The package ships the whole review screen. Push it and your testers get the session list, the step-by-step replay and every export action, with no UI code of your own." />
+            <Border Style="{StaticResource CodeBlock}">
+                <Label Style="{StaticResource Code}"
+                       Text="using SessionCapture.Maui.Views;&#10;&#10;await Navigation.PushAsync(&#10;    new SessionCapturePage());" />
+            </Border>
+            <Label Style="{StaticResource Caption}"
+                   Text="It pushes a detail page, so present it inside a NavigationPage or Shell. The rest of this page is what that screen does internally, for apps that want their own." />
+
             <Label Text="Read the session back" Style="{StaticResource SectionTitle}" />
             <Border Style="{StaticResource CodeBlock}">
                 <Label Style="{StaticResource Code}"
@@ -61,7 +71,8 @@
                 <VerticalStackLayout Spacing="8">
                     <Label Text="LIVE &#8212; review the newest session" Style="{StaticResource DemoLabel}" />
                     <Label x:Name="ResultLabel" Style="{StaticResource Mono}" />
-                    <Button Text="Open newest session" Clicked="OnOpenNewestClicked" />
+                    <Button Text="Open the built-in SessionCapturePage" Clicked="OnOpenBuiltInClicked" />
+                    <Button Text="Open newest session (this app's own page)" Clicked="OnOpenNewestClicked" />
                 </VerticalStackLayout>
             </Border>
 
