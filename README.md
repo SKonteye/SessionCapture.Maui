@@ -201,8 +201,8 @@ Handle the `null`: steps recorded by `CloseSessionSilentlyAsync`, which recovers
 a session the app never closed cleanly, carry no screenshot. Binding a `null`
 straight to an `Image` shows an empty box with no hint why.
 
-The sample's **Stored sessions** page does exactly this — tap any session to see
-its steps, then export, share or delete it.
+This is what `SessionCapturePage` does internally, so reach for it only when you
+want different styling or a different layout.
 
 ## Platform notes
 
@@ -214,10 +214,11 @@ its steps, then export, share or delete it.
 
 ## Sample
 
-`samples/SessionCapture.Sample` is a documentation app: eight pages, each
+`samples/SessionCapture.Sample` is a documentation app: seven pages, each
 explaining one concept with the exact code and a live control that calls the
-real library. **Stored sessions** goes further and reviews a recorded run:
-tap a session to page through its screenshots, notes and timings.
+real library. The eighth flyout entry, **Stored sessions**, is not a sample page
+at all — it is `SessionCapturePage` from the package, so you can see what one
+line of integration actually gets you.
 
 ## Status
 

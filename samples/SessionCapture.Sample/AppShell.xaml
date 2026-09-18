@@ -36,16 +36,10 @@
                   ContentTemplate="{DataTemplate local:ReviewPage}"
                   Route="review" />
 
-    <!-- The page the package ships. A consuming app gets this for one line, so
-         the sample shows it as a real destination rather than only describing
-         it. StoredSessionsPage below is the hand-built equivalent, kept as the
-         worked example for apps that want their own. -->
-    <ShellContent Title="Built-in viewer"
+    <!-- Library code, not sample code: this is the page the package ships, so a
+         reader sees exactly what one line of integration buys them. -->
+    <ShellContent Title="Stored sessions"
                   ContentTemplate="{DataTemplate views:SessionCapturePage}"
-                  Route="builtin" />
-
-    <ShellContent Title="Hand-built equivalent"
-                  ContentTemplate="{DataTemplate local:StoredSessionsPage}"
                   Route="stored" />
 
 </Shell>

@@ -64,7 +64,7 @@
 
             <Border Style="{StaticResource NoteCard}">
                 <Label Style="{StaticResource NoteText}"
-                       Text="Open 'Stored sessions' in the flyout and tap any row. That screen is this page's code running for real: metadata, every step with its screenshot, and the export actions." />
+                       Text="Open 'Stored sessions' in the flyout and tap any row. That is not a sample page: it is SessionCapturePage from the package, running here exactly as it would in your app." />
             </Border>
 
             <Border Style="{StaticResource DemoCard}">
@@ -72,7 +72,6 @@
                     <Label Text="LIVE &#8212; review the newest session" Style="{StaticResource DemoLabel}" />
                     <Label x:Name="ResultLabel" Style="{StaticResource Mono}" />
                     <Button Text="Open the built-in SessionCapturePage" Clicked="OnOpenBuiltInClicked" />
-                    <Button Text="Open newest session (this app's own page)" Clicked="OnOpenNewestClicked" />
                 </VerticalStackLayout>
             </Border>
 

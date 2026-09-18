@@ -16,23 +16,6 @@ public partial class ReviewPage : DocPage
         => await RunDemoAsync(ResultLabel, async () =>
         {
             await Navigation.PushAsync(new SessionCapturePage());
-            return "opened the library's built-in page";
-        });
-
-    private async void OnOpenNewestClicked(object? sender, EventArgs e)
-        => await RunDemoAsync(ResultLabel, async () =>
-        {
-            var sessions = await Capture!.GetAllSessionsAsync();
-            var newest = sessions.OrderByDescending(s => s.StartedAt).FirstOrDefault();
-
-            if (newest == null)
-            {
-                return "no stored sessions yet - record one first";
-            }
-
-            await Shell.Current.GoToAsync(
-                $"{nameof(SessionDetailPage)}?id={Uri.EscapeDataString(newest.Id)}");
-
-            return $"opened {newest.Name}";
+            return "opened the page the package ships";
         });
 }

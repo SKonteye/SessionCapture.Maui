@@ -17,7 +17,7 @@
 
             <Label Text="How this app is organised" Style="{StaticResource SectionTitle}" />
             <Label Style="{StaticResource Body}"
-                   Text="Each page covers one concept, shows the exact code, and gives you a live control that calls the real library. Open the flyout to move between them. 'Built-in viewer' is not a demo page: it is the screen the package ships, running here exactly as it would in your app." />
+                   Text="Each page covers one concept, shows the exact code, and gives you a live control that calls the real library. Open the flyout to move between them. 'Stored sessions' is not a demo page: it is the screen the package ships, running here exactly as it would in your app." />
 
             <Border Style="{StaticResource NoteCard}">
                 <Label Style="{StaticResource NoteText}"
