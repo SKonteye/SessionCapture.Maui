@@ -13,11 +13,11 @@
 
             <Label Text="What it gives you" Style="{StaticResource SectionTitle}" />
             <Label Style="{StaticResource Body}"
-                   Text="&#8226; A floating overlay button to start, stop and capture&#10;&#8226; Automatic screenshots when the user navigates&#10;&#8226; Manual captures, optionally with a note&#10;&#8226; Local storage with a JSON index per session&#10;&#8226; Export as ZIP, native share, or save to the photo gallery" />
+                   Text="&#8226; A floating overlay button to start, stop and capture&#10;&#8226; Automatic screenshots when the user navigates&#10;&#8226; Manual captures, optionally with a note&#10;&#8226; Local storage with a JSON index per session&#10;&#8226; A built-in page that replays a session and exports it&#10;&#8226; Export as ZIP, native share, or save to the photo gallery" />
 
             <Label Text="How this app is organised" Style="{StaticResource SectionTitle}" />
             <Label Style="{StaticResource Body}"
-                   Text="Each page covers one concept, shows the exact code, and gives you a live control that calls the real library. Open the flyout to move between them." />
+                   Text="Each page covers one concept, shows the exact code, and gives you a live control that calls the real library. Open the flyout to move between them. 'Built-in viewer' is not a demo page: it is the screen the package ships, running here exactly as it would in your app." />
 
             <Border Style="{StaticResource NoteCard}">
                 <Label Style="{StaticResource NoteText}"

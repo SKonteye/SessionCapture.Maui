@@ -7,9 +7,9 @@
              Title="Stored sessions">
     <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
 
-        <Label Grid.Row="0" Text="Stored sessions" Style="{StaticResource Heading}" />
+        <Label Grid.Row="0" Text="Hand-built equivalent" Style="{StaticResource Heading}" />
         <Label Grid.Row="1" Style="{StaticResource Caption}"
-               Text="Everything GetAllSessionsAsync returns, newest first. Tap a session to review its steps." />
+               Text="What the built-in viewer does, rebuilt from the public API. You only need this if you want your own styling or layout; otherwise push SessionCapturePage. Tap a session to review its steps." />
 
         <CollectionView Grid.Row="2" x:Name="SessionList" Margin="0,6,0,0"
                         SelectionMode="Single"
