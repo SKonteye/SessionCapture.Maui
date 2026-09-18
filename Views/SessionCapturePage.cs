@@ -48,7 +48,7 @@ public class SessionCapturePage : ContentPage
         _capture = capture;
 
         Resources = SessionCaptureTheme.Build();
-        BackgroundColor = SessionCaptureTheme.PageBackground;
+        this.ThemedPage();
         Title = "Sessions";
 
         BuildLayout();
@@ -60,15 +60,16 @@ public class SessionCapturePage : ContentPage
         {
             Text = "Recorded sessions",
             Style = (Style)Resources["SessionCaptureHeading"]
-        };
+        }.ThemedText();
 
         var subtitle = new Label
         {
             Text = "Tap a session to review its steps and export it.",
             Style = (Style)Resources["SessionCaptureCaption"]
-        };
+        }.ThemedMuted();
 
         _status.Style = (Style)Resources["SessionCaptureCaption"];
+        _status.ThemedMuted();
 
         _sessions.SelectionMode = SelectionMode.Single;
         _sessions.SelectionChanged += OnSessionSelected;
@@ -77,16 +78,12 @@ public class SessionCapturePage : ContentPage
         {
             Text = "No sessions recorded yet.",
             Style = (Style)Resources["SessionCaptureCaption"]
-        };
+        }.ThemedMuted();
 
         var reload = new Button { Text = "Reload" };
         reload.Clicked += async (_, _) => await LoadAsync();
 
-        var deleteAll = new Button
-        {
-            Text = "Delete all",
-            Style = (Style)Resources["SessionCaptureDangerButton"]
-        };
+        var deleteAll = new Button { Text = "Delete all" }.ThemedDanger();
         deleteAll.Clicked += OnDeleteAllClicked;
 
         var grid = new Grid
@@ -119,22 +116,22 @@ public class SessionCapturePage : ContentPage
 
     private object BuildSessionTemplate()
     {
-        var name = new Label { FontAttributes = FontAttributes.Bold };
+        var name = new Label { FontAttributes = FontAttributes.Bold }.ThemedText();
         name.SetBinding(Label.TextProperty, static (CapturedSession s) => s.Name);
 
-        var steps = new Label { Style = (Style)Resources["SessionCaptureCaption"] };
+        var steps = new Label { Style = (Style)Resources["SessionCaptureCaption"] }.ThemedMuted();
         steps.SetBinding(
             Label.TextProperty,
             static (CapturedSession s) => s.StepCount,
             stringFormat: "{0} step(s)");
 
-        var started = new Label { Style = (Style)Resources["SessionCaptureCaption"] };
+        var started = new Label { Style = (Style)Resources["SessionCaptureCaption"] }.ThemedMuted();
         started.SetBinding(
             Label.TextProperty,
             static (CapturedSession s) => s.StartedAt,
             stringFormat: "{0:g}");
 
-        var tester = new Label { Style = (Style)Resources["SessionCaptureCaption"] };
+        var tester = new Label { Style = (Style)Resources["SessionCaptureCaption"] }.ThemedMuted();
         tester.SetBinding(
             Label.TextProperty,
             static (CapturedSession s) => s.TesterName,

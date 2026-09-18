@@ -34,7 +34,7 @@ public class SessionDetailPage : ContentPage
         _sessionId = sessionId;
 
         Resources = SessionCaptureTheme.Build();
-        BackgroundColor = SessionCaptureTheme.PageBackground;
+        this.ThemedPage();
         Title = "Session";
 
         BuildLayout();
@@ -43,16 +43,20 @@ public class SessionDetailPage : ContentPage
     private void BuildLayout()
     {
         _name.Style = (Style)Resources["SessionCaptureHeading"];
+        _name.ThemedText();
         _meta.Style = (Style)Resources["SessionCaptureCaption"];
+        _meta.ThemedMuted();
         _device.Style = (Style)Resources["SessionCaptureCaption"];
+        _device.ThemedMuted();
         _status.Style = (Style)Resources["SessionCaptureCaption"];
+        _status.ThemedMuted();
 
         _steps.ItemTemplate = new DataTemplate(BuildStepTemplate);
         _steps.EmptyView = new Label
         {
             Text = "This session recorded no steps.",
             Style = (Style)Resources["SessionCaptureCaption"]
-        };
+        }.ThemedMuted();
 
         var exportButton = new Button { Text = "Export as ZIP" };
         exportButton.Clicked += OnExportClicked;
@@ -63,11 +67,7 @@ public class SessionDetailPage : ContentPage
         var saveButton = new Button { Text = "Save to photos" };
         saveButton.Clicked += OnSaveClicked;
 
-        var deleteButton = new Button
-        {
-            Text = "Delete this session",
-            Style = (Style)Resources["SessionCaptureDangerButton"]
-        };
+        var deleteButton = new Button { Text = "Delete this session" }.ThemedDanger();
         deleteButton.Clicked += OnDeleteClicked;
 
         var header = new VerticalStackLayout
@@ -103,23 +103,23 @@ public class SessionDetailPage : ContentPage
 
     private object BuildStepTemplate()
     {
-        var thumb = new Image { Style = (Style)Resources["SessionCaptureThumb"] };
+        var thumb = new Image { Style = (Style)Resources["SessionCaptureThumb"] }.ThemedThumb();
         thumb.SetBinding(Image.SourceProperty, static (SessionStepView s) => s.ImagePath);
 
-        var heading = new Label { Style = (Style)Resources["SessionCaptureStepNumber"] };
+        var heading = new Label { Style = (Style)Resources["SessionCaptureStepNumber"] }.ThemedPrimary();
         heading.SetBinding(Label.TextProperty, static (SessionStepView s) => s.Heading);
 
-        var page = new Label { FontAttributes = FontAttributes.Bold };
+        var page = new Label { FontAttributes = FontAttributes.Bold }.ThemedText();
         page.SetBinding(Label.TextProperty, static (SessionStepView s) => s.PageName);
 
-        var time = new Label { Style = (Style)Resources["SessionCaptureCaption"] };
+        var time = new Label { Style = (Style)Resources["SessionCaptureCaption"] }.ThemedMuted();
         time.SetBinding(Label.TextProperty, static (SessionStepView s) => s.Timestamp);
 
-        var viewModel = new Label { Style = (Style)Resources["SessionCaptureCaption"] };
+        var viewModel = new Label { Style = (Style)Resources["SessionCaptureCaption"] }.ThemedMuted();
         viewModel.SetBinding(Label.TextProperty, static (SessionStepView s) => s.ViewModelName);
         viewModel.SetBinding(IsVisibleProperty, static (SessionStepView s) => s.HasViewModel);
 
-        var note = new Label { Style = (Style)Resources["SessionCaptureNote"] };
+        var note = new Label { Style = (Style)Resources["SessionCaptureNote"] }.ThemedNote();
         note.SetBinding(Label.TextProperty, static (SessionStepView s) => s.UserNote);
         note.SetBinding(IsVisibleProperty, static (SessionStepView s) => s.HasNote);
 
@@ -127,7 +127,7 @@ public class SessionDetailPage : ContentPage
         {
             Text = "screenshot missing",
             Style = (Style)Resources["SessionCaptureCaption"]
-        };
+        }.ThemedMuted();
         missing.SetBinding(IsVisibleProperty, static (SessionStepView s) => s.IsMissingImage);
 
         var text = new VerticalStackLayout
