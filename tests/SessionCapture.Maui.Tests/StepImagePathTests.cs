@@ -20,10 +20,34 @@ namespace SessionCapture.Maui.Tests;
 /// </summary>
 internal static class StepImagePathResolver
 {
+    /// <summary>
+    /// Mirrors SessionCaptureService.IsSafeSessionId. A session id becomes a
+    /// folder name, so anything that can traverse out of the storage root has to
+    /// be rejected before it reaches Path.Combine: "../../../etc" resolves to a
+    /// path outside the app's own storage.
+    /// </summary>
+    public static bool IsSafeSessionId(string sessionId)
+    {
+        if (string.IsNullOrWhiteSpace(sessionId))
+        {
+            return false;
+        }
+
+        foreach (var c in sessionId)
+        {
+            if (!char.IsLetterOrDigit(c) && c != '-' && c != '_')
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /// <summary>Mirrors the intended GetStepImagePath implementation.</summary>
     public static string? Resolve(string storageRoot, string sessionId, string screenshotFileName)
     {
-        if (string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(screenshotFileName))
+        if (!IsSafeSessionId(sessionId) || string.IsNullOrWhiteSpace(screenshotFileName))
         {
             return null;
         }
@@ -63,6 +87,35 @@ public class StepImagePathTests
         var path = StepImagePathResolver.Resolve(Root, "", "step_001_HomePage.jpg");
 
         Assert.Null(path);
+    }
+
+    [Theory]
+    [InlineData("../../../etc")]
+    [InlineData("..")]
+    [InlineData("abc/../../..")]
+    [InlineData("abc/def")]
+    [InlineData("abc\\def")]
+    public void Resolve_ReturnsNull_ForASessionIdThatCouldTraverse(string sessionId)
+    {
+        var path = StepImagePathResolver.Resolve(Root, sessionId, "step_001_HomePage.jpg");
+
+        Assert.Null(path);
+    }
+
+    [Fact]
+    public void Resolve_NeverEscapesTheStorageRoot()
+    {
+        // Without the guard this resolves to /data/app/etc/passwd, outside Root.
+        var path = StepImagePathResolver.Resolve(Root, "../../../etc", "passwd");
+
+        Assert.Null(path);
+    }
+
+    [Fact]
+    public void IsSafeSessionId_AcceptsTheIdsTheLibraryActuallyGenerates()
+    {
+        // CapturedSession.Id is Guid.NewGuid().ToString("N").
+        Assert.True(StepImagePathResolver.IsSafeSessionId(Guid.NewGuid().ToString("N")));
     }
 
     [Fact]

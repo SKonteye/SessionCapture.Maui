@@ -38,8 +38,14 @@ public sealed class SessionStepView
     /// <summary>The binding context type recorded with the step, if any.</summary>
     public string? ViewModelName => Step.ViewModelName;
 
+    /// <summary>True when the tester left a note on this step.</summary>
     public bool HasNote => !string.IsNullOrWhiteSpace(UserNote);
 
+    /// <summary>
+    /// True when a meaningful binding context type was recorded. Auto-captured
+    /// steps store "Unknown" when the page had no view model, which is not worth
+    /// showing.
+    /// </summary>
     public bool HasViewModel =>
         !string.IsNullOrWhiteSpace(ViewModelName) &&
         !string.Equals(ViewModelName, "Unknown", StringComparison.OrdinalIgnoreCase);

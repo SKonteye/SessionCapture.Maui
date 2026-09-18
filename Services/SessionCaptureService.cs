@@ -311,7 +311,13 @@ public sealed class SessionCaptureService : ISessionCaptureService
 
     public async Task<CapturedSession?> GetSessionAsync(string sessionId)
     {
-        var sessionFolder = Path.Combine(_storageRoot, $"session_{sessionId}");
+        var sessionFolder = TryGetSessionFolder(sessionId);
+
+        if (sessionFolder == null)
+        {
+            return null;
+        }
+
         var sessionFile = Path.Combine(sessionFolder, "session.json");
 
         if (!File.Exists(sessionFile))
@@ -336,21 +342,64 @@ public sealed class SessionCaptureService : ISessionCaptureService
         }
     }
 
+    /// <summary>
+    /// A session id becomes a folder name, so it has to be checked before it
+    /// reaches <see cref="Path.Combine(string, string)"/>. The ids this library
+    /// generates are <c>Guid.NewGuid().ToString("N")</c>, but these methods are
+    /// public API and a caller can pass anything: "../../../etc" would resolve
+    /// to a path outside the storage root.
+    /// </summary>
+    private static bool IsSafeSessionId(string sessionId)
+    {
+        if (string.IsNullOrWhiteSpace(sessionId))
+        {
+            return false;
+        }
+
+        foreach (var c in sessionId)
+        {
+            if (!char.IsLetterOrDigit(c) && c != '-' && c != '_')
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// The folder holding one session, or <c>null</c> when the id could escape
+    /// the storage root.
+    /// </summary>
+    private string? TryGetSessionFolder(string sessionId)
+        => IsSafeSessionId(sessionId)
+            ? Path.Combine(_storageRoot, $"session_{sessionId}")
+            : null;
+
     public string? GetStepImagePath(string sessionId, CapturedStep step)
     {
         ArgumentNullException.ThrowIfNull(step);
+
+        var sessionFolder = TryGetSessionFolder(sessionId);
 
         // A step can legitimately have no screenshot: CloseSessionSilentlyAsync
         // records recovery steps that way. Combining an empty name would yield
         // the session folder, and binding a directory to an Image shows nothing
         // rather than failing, so return null and let the caller show a
         // placeholder.
-        if (string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(step.ScreenshotFileName))
+        if (sessionFolder == null || string.IsNullOrWhiteSpace(step.ScreenshotFileName))
         {
             return null;
         }
 
-        var path = Path.Combine(_storageRoot, $"session_{sessionId}", step.ScreenshotFileName);
+        // The file name comes from our own index, but it is combined into a
+        // path just like the id, so it gets the same treatment.
+        if (Path.GetFileName(step.ScreenshotFileName) != step.ScreenshotFileName)
+        {
+            return null;
+        }
+
+        var path = Path.Combine(sessionFolder, step.ScreenshotFileName);
 
         return File.Exists(path) ? path : null;
     }
@@ -365,8 +414,10 @@ public sealed class SessionCaptureService : ISessionCaptureService
                 throw new InvalidOperationException("Cannot delete the session that is currently being recorded.");
             }
 
-            var sessionFolder = Path.Combine(_storageRoot, $"session_{sessionId}");
-            if (Directory.Exists(sessionFolder))
+            // Guarded before the recursive delete: an id that traverses out of
+            // the storage root would take the delete with it.
+            var sessionFolder = TryGetSessionFolder(sessionId);
+            if (sessionFolder != null && Directory.Exists(sessionFolder))
             {
                 Directory.Delete(sessionFolder, recursive: true);
             }
@@ -425,7 +476,14 @@ public sealed class SessionCaptureService : ISessionCaptureService
             return;
         }
 
-        var sessionFolder = Path.Combine(_storageRoot, $"session_{sessionId}");
+        // GetSessionAsync already rejected an unsafe id, but resolve through the
+        // same helper rather than rebuilding the path and relying on that.
+        var sessionFolder = TryGetSessionFolder(sessionId);
+        if (sessionFolder == null)
+        {
+            return;
+        }
+
         foreach (var step in session.Steps)
         {
             var filePath = Path.Combine(sessionFolder, step.ScreenshotFileName);
@@ -448,7 +506,14 @@ public sealed class SessionCaptureService : ISessionCaptureService
             return null;
         }
 
-        var sessionFolder = Path.Combine(_storageRoot, $"session_{sessionId}");
+        // The id reaches the cache directory too, which the GetSessionAsync
+        // guard above does not cover, so resolve both through the helper.
+        var sessionFolder = TryGetSessionFolder(sessionId);
+        if (sessionFolder == null)
+        {
+            return null;
+        }
+
         var tempFolder = Path.Combine(FileSystem.CacheDirectory, $"sessioncapture_export_{sessionId}");
 
         if (Directory.Exists(tempFolder))
