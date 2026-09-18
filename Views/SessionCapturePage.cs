@@ -59,16 +59,16 @@ public class SessionCapturePage : ContentPage
         var heading = new Label
         {
             Text = "Recorded sessions",
-            Style = (Style)Resources["SessionCaptureHeading"]
+            Style = Resources.Heading()
         }.ThemedText();
 
         var subtitle = new Label
         {
             Text = "Tap a session to review its steps and export it.",
-            Style = (Style)Resources["SessionCaptureCaption"]
+            Style = Resources.Caption()
         }.ThemedMuted();
 
-        _status.Style = (Style)Resources["SessionCaptureCaption"];
+        _status.Style = Resources.Caption();
         _status.ThemedMuted();
 
         _sessions.SelectionMode = SelectionMode.Single;
@@ -77,7 +77,7 @@ public class SessionCapturePage : ContentPage
         _sessions.EmptyView = new Label
         {
             Text = "No sessions recorded yet.",
-            Style = (Style)Resources["SessionCaptureCaption"]
+            Style = Resources.Caption()
         }.ThemedMuted();
 
         var reload = new Button { Text = "Reload" };
@@ -119,19 +119,19 @@ public class SessionCapturePage : ContentPage
         var name = new Label { FontAttributes = FontAttributes.Bold }.ThemedText();
         name.SetBinding(Label.TextProperty, static (CapturedSession s) => s.Name);
 
-        var steps = new Label { Style = (Style)Resources["SessionCaptureCaption"] }.ThemedMuted();
+        var steps = new Label { Style = Resources.Caption() }.ThemedMuted();
         steps.SetBinding(
             Label.TextProperty,
             static (CapturedSession s) => s.StepCount,
             stringFormat: "{0} step(s)");
 
-        var started = new Label { Style = (Style)Resources["SessionCaptureCaption"] }.ThemedMuted();
+        var started = new Label { Style = Resources.Caption() }.ThemedMuted();
         started.SetBinding(
             Label.TextProperty,
             static (CapturedSession s) => s.StartedAt,
             stringFormat: "{0:g}");
 
-        var tester = new Label { Style = (Style)Resources["SessionCaptureCaption"] }.ThemedMuted();
+        var tester = new Label { Style = Resources.Caption() }.ThemedMuted();
         tester.SetBinding(
             Label.TextProperty,
             static (CapturedSession s) => s.TesterName,
@@ -139,14 +139,14 @@ public class SessionCapturePage : ContentPage
 
         return new Border
         {
-            Style = (Style)Resources["SessionCaptureCard"],
+            Style = Resources.Card(),
             Margin = new Thickness(0, 0, 0, 8),
             Content = new VerticalStackLayout
             {
                 Spacing = 3,
                 Children = { name, steps, started, tester }
             }
-        };
+        }.ThemedCard();
     }
 
     /// <inheritdoc />

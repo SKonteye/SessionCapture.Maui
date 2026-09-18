@@ -103,6 +103,36 @@ internal static class SessionCaptureTheme
         return button;
     }
 
+    // Looked up by name from two other files, so the names live here once and
+    // are reached through the accessors below: a mistyped key would otherwise
+    // be a runtime KeyNotFoundException with no compile-time signal.
+    private const string CardKey = "SessionCaptureCard";
+    private const string HeadingKey = "SessionCaptureHeading";
+    private const string CaptionKey = "SessionCaptureCaption";
+    private const string NoteKey = "SessionCaptureNote";
+    private const string StepNumberKey = "SessionCaptureStepNumber";
+    private const string ThumbKey = "SessionCaptureThumb";
+
+    /// <summary>The card style for a session or step row.</summary>
+    public static Style Card(this ResourceDictionary resources) => Get(resources, CardKey);
+
+    /// <summary>The page-title style.</summary>
+    public static Style Heading(this ResourceDictionary resources) => Get(resources, HeadingKey);
+
+    /// <summary>The small secondary-text style.</summary>
+    public static Style Caption(this ResourceDictionary resources) => Get(resources, CaptionKey);
+
+    /// <summary>The style for a tester's note.</summary>
+    public static Style Note(this ResourceDictionary resources) => Get(resources, NoteKey);
+
+    /// <summary>The style for a step's number and type.</summary>
+    public static Style StepNumber(this ResourceDictionary resources) => Get(resources, StepNumberKey);
+
+    /// <summary>The style for a step's screenshot thumbnail.</summary>
+    public static Style Thumb(this ResourceDictionary resources) => Get(resources, ThumbKey);
+
+    private static Style Get(ResourceDictionary resources, string key) => (Style)resources[key];
+
     /// <summary>
     /// Shapes and sizes only. Everything that carries a colour is applied per
     /// element through the extensions above.
@@ -111,7 +141,7 @@ internal static class SessionCaptureTheme
     {
         var resources = new ResourceDictionary();
 
-        resources.Add("SessionCaptureCard", new Style(typeof(Border))
+        resources.Add(CardKey, new Style(typeof(Border))
         {
             Setters =
             {
@@ -121,7 +151,7 @@ internal static class SessionCaptureTheme
             }
         });
 
-        resources.Add("SessionCaptureHeading", new Style(typeof(Label))
+        resources.Add(HeadingKey, new Style(typeof(Label))
         {
             Setters =
             {
@@ -130,7 +160,7 @@ internal static class SessionCaptureTheme
             }
         });
 
-        resources.Add("SessionCaptureCaption", new Style(typeof(Label))
+        resources.Add(CaptionKey, new Style(typeof(Label))
         {
             Setters =
             {
@@ -138,7 +168,7 @@ internal static class SessionCaptureTheme
             }
         });
 
-        resources.Add("SessionCaptureNote", new Style(typeof(Label))
+        resources.Add(NoteKey, new Style(typeof(Label))
         {
             Setters =
             {
@@ -146,7 +176,7 @@ internal static class SessionCaptureTheme
             }
         });
 
-        resources.Add("SessionCaptureStepNumber", new Style(typeof(Label))
+        resources.Add(StepNumberKey, new Style(typeof(Label))
         {
             Setters =
             {
@@ -157,7 +187,7 @@ internal static class SessionCaptureTheme
 
         // Screenshots are portrait phone captures; this keeps the ratio so the
         // thumbnail is not letterboxed.
-        resources.Add("SessionCaptureThumb", new Style(typeof(Image))
+        resources.Add(ThumbKey, new Style(typeof(Image))
         {
             Setters =
             {
