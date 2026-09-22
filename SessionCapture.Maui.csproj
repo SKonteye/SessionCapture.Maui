@@ -16,13 +16,11 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>maui;android;ios;screenshot;testing;qa;bug-report;session-capture</PackageTags>
 
-    <!-- Set these once the repository is published; nuget.org renders them as
-         links, so pointing them at a repo that does not exist yet would ship a
-         dead link on the package page.
+    <!-- The repository is public, so nuget.org renders these as live links on
+         the package page. -->
     <PackageProjectUrl>https://github.com/SKonteye/SessionCapture.Maui</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SKonteye/SessionCapture.Maui</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    -->
 
     <!-- Ship a symbol package and embed source-link metadata so consumers can
          step into the library when debugging their own app. -->

@@ -1,0 +1,70 @@
+name: Release
+
+# Manual only. A NuGet version is immutable once published -- 1.0.0 can be
+# unlisted but never replaced -- so publishing is a deliberate button press
+# rather than a side effect of pushing a tag.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build, test and pack, but do not push to nuget.org"
+        type: boolean
+        default: false
+
+jobs:
+  publish:
+    # macOS is required: the package targets net10.0-ios as well as
+    # net10.0-android, and the iOS workload does not build elsewhere.
+    runs-on: macos-latest
+
+    permissions:
+      # Lets GitHub mint the OIDC token that NuGet/login exchanges for a
+      # short-lived API key. Without this the login step fails.
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install MAUI workloads
+        run: dotnet workload restore
+
+      # The library itself is Android/iOS only, so the unit tests live in a
+      # plain net10.0 project and gate the publish.
+      - name: Test
+        run: dotnet test tests/SessionCapture.Maui.Tests -c Release
+
+      - name: Pack
+        run: dotnet pack SessionCapture.Maui.csproj -c Release -o artifacts
+
+      - name: Show what was packed
+        run: |
+          ls -l artifacts
+          unzip -l artifacts/*.nupkg
+
+      # The temporary API key is valid for about an hour, so it is requested
+      # here rather than earlier in the job.
+      - name: NuGet login
+        if: ${{ !inputs.dry_run }}
+        uses: NuGet/login@v1
+        id: login
+        with:
+          # nuget.org profile name, not an email address or the GitHub login.
+          user: Mambadev
+
+      - name: Push
+        if: ${{ !inputs.dry_run }}
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --api-key ${{ steps.login.outputs.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*
