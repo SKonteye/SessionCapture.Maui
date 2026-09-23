@@ -534,7 +534,10 @@ public sealed class SessionCaptureOverlayService : ISessionCaptureOverlayService
             TextSize = textSizeSp * density,
             TextAlign = Paint.Align.Center
         };
-        paint.SetColor(color);
+        // Not SetColor(color): Color converts to long there, which binds to
+        // setColor(long), and Android rejects an ARGB int read as a packed
+        // color-space long with "Invalid ID". The property calls setColor(int).
+        paint.Color = color;
 
         var xPosition = sizePx / 2f;
         var yPosition = (sizePx / 2f) - ((paint.Descent() + paint.Ascent()) / 2f);
