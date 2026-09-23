@@ -182,7 +182,10 @@ public sealed class SessionCaptureOverlayService : ISessionCaptureOverlayService
         _fab.Elevation = elevationPx;
         _fab.CompatElevation = elevationPx;
         _fab.RippleColor = ColorWhiteSemiTransparent;
-        _fab.SetImageDrawable(CreateTextDrawable(context, "\U0001F4F7", 20, ColorWhite));
+        _fab.SetImageDrawable(CreateCameraDrawable(context, FabSizeDp, 24, ColorWhite));
+        // The FAB tints its icon with the theme's colorOnSecondary, black under
+        // the MAUI theme, whatever color the drawable was painted in.
+        _fab.ImageTintList = global::Android.Content.Res.ColorStateList.ValueOf(ColorWhite);
         _fab.SetScaleType(ImageView.ScaleType.Center!);
 
         var layoutParams = new FrameLayout.LayoutParams(fabSizePx, fabSizePx)
@@ -287,15 +290,12 @@ public sealed class SessionCaptureOverlayService : ISessionCaptureOverlayService
         countParams.Gravity = GravityFlags.CenterVertical;
         _recordingBar.AddView(_captureCountLabel, countParams);
 
-        var captureButton = new TextView(context)
-        {
-            Text = "\U0001F4F8",
-            TextSize = 18
-        };
-        captureButton.SetTextColor(ColorWhite);
+        var captureButton = new ImageView(context);
+        captureButton.SetImageDrawable(CreateCameraDrawable(context, ButtonSizeDp, 20, ColorWhite));
+        captureButton.SetScaleType(ImageView.ScaleType.Center!);
+        captureButton.ContentDescription = "Capture screenshot";
         captureButton.Clickable = true;
         captureButton.Focusable = true;
-        captureButton.Gravity = GravityFlags.Center;
         captureButton.Click += OnManualCaptureClicked;
         var captureParams = new LinearLayout.LayoutParams(buttonSizePx, buttonSizePx);
         captureParams.SetMargins(0, 0, elementSpacingPx, 0);
@@ -540,26 +540,43 @@ public sealed class SessionCaptureOverlayService : ISessionCaptureOverlayService
         return testerName;
     }
 
-    private static Drawable CreateTextDrawable(Context context, string text, int textSizeSp, Color color)
+    /// <summary>
+    /// Draws a filled camera, the Android counterpart of the iOS overlay's
+    /// camera.fill symbol. Drawn as shapes rather than an emoji, because a
+    /// color emoji keeps its own colors and cannot match the white iOS symbol.
+    /// </summary>
+    private static Drawable CreateCameraDrawable(Context context, int boxDp, int glyphDp, Color color)
     {
         var density = context.Resources?.DisplayMetrics?.Density ?? 1f;
-        var sizePx = (int)(FabSizeDp * density);
-        var bitmap = Bitmap.CreateBitmap(sizePx, sizePx, Bitmap.Config.Argb8888!);
+        var boxPx = (int)(boxDp * density);
+        var bitmap = Bitmap.CreateBitmap(boxPx, boxPx, Bitmap.Config.Argb8888!);
         var canvas = new Canvas(bitmap!);
 
-        var paint = new Paint(PaintFlags.AntiAlias)
-        {
-            TextSize = textSizeSp * density,
-            TextAlign = Paint.Align.Center
-        };
+        // The glyph is laid out on a 24-unit grid, centered in the box.
+        var scale = glyphDp * density / 24f;
+        var offset = (boxPx - (24f * scale)) / 2f;
+        canvas.Translate(offset, offset);
+        canvas.Scale(scale, scale);
+
         // Not SetColor(color): Color converts to long there, which binds to
         // setColor(long), and Android rejects an ARGB int read as a packed
         // color-space long with "Invalid ID". The property calls setColor(int).
-        paint.Color = color;
+        var paint = new Paint(PaintFlags.AntiAlias) { Color = color };
 
-        var xPosition = sizePx / 2f;
-        var yPosition = (sizePx / 2f) - ((paint.Descent() + paint.Ascent()) / 2f);
-        canvas.DrawText(text, xPosition, yPosition, paint);
+        var body = new global::Android.Graphics.Path();
+        body.AddRoundRect(new global::Android.Graphics.RectF(2f, 7f, 22f, 20.5f), 2.5f, 2.5f, global::Android.Graphics.Path.Direction.Cw!);
+        body.MoveTo(8f, 7.5f);
+        body.LineTo(9.5f, 4.5f);
+        body.LineTo(14.5f, 4.5f);
+        body.LineTo(16f, 7.5f);
+        body.Close();
+        canvas.DrawPath(body, paint);
+
+        // Punch the lens ring out of the body, then fill its center.
+        var clear = new Paint(PaintFlags.AntiAlias);
+        clear.SetXfermode(new PorterDuffXfermode(PorterDuff.Mode.Clear!));
+        canvas.DrawCircle(12f, 13.75f, 4.5f, clear);
+        canvas.DrawCircle(12f, 13.75f, 2.75f, paint);
 
         return new BitmapDrawable(context.Resources, bitmap);
     }
