@@ -199,17 +199,7 @@ public sealed class SessionCaptureOverlayService : ISessionCaptureOverlayService
 
         _rootView.AddView(_fab, layoutParams);
         _fab.BringToFront();
-
-        var savedX = Preferences.Default.Get(SessionCaptureKeys.OverlayX, -1f);
-        var savedY = Preferences.Default.Get(SessionCaptureKeys.OverlayY, -1f);
-        if (savedX >= 0 && savedY >= 0)
-        {
-            _fab.Post(() =>
-            {
-                _fab?.SetX(savedX);
-                _fab?.SetY(savedY);
-            });
-        }
+        RestoreSavedPosition(_fab);
     }
 
     private void CreateRecordingBar()
@@ -336,17 +326,41 @@ public sealed class SessionCaptureOverlayService : ISessionCaptureOverlayService
 
         _rootView.AddView(_recordingBar, layoutParams);
         _recordingBar.BringToFront();
+        RestoreSavedPosition(_recordingBar);
+    }
 
+    /// <summary>
+    /// Moves the view to the last dragged position, unless it would not fit
+    /// there. The idle button and the much wider recording bar share one saved
+    /// position, so a spot that suits the button can push the bar's capture and
+    /// stop buttons off screen. Like iOS, an out-of-bounds spot keeps the
+    /// default corner.
+    /// </summary>
+    private void RestoreSavedPosition(View view)
+    {
         var savedX = Preferences.Default.Get(SessionCaptureKeys.OverlayX, -1f);
         var savedY = Preferences.Default.Get(SessionCaptureKeys.OverlayY, -1f);
-        if (savedX >= 0 && savedY >= 0)
+        if (savedX < 0 || savedY < 0)
         {
-            _recordingBar.Post(() =>
-            {
-                _recordingBar?.SetX(savedX);
-                _recordingBar?.SetY(savedY);
-            });
+            return;
         }
+
+        // Posted so the view has been laid out and its size is known.
+        view.Post(() =>
+        {
+            if (view.Handle == IntPtr.Zero || view.Parent is not ViewGroup parent)
+            {
+                return;
+            }
+
+            if (savedX > parent.Width - view.Width || savedY > parent.Height - view.Height)
+            {
+                return;
+            }
+
+            view.SetX(savedX);
+            view.SetY(savedY);
+        });
     }
 
     private void RemoveCurrentOverlay()
