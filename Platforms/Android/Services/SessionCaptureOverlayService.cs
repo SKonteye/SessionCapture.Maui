@@ -230,6 +230,10 @@ public sealed class SessionCaptureOverlayService : ISessionCaptureOverlayService
         };
         _recordingBar.SetGravity(GravityFlags.CenterVertical);
         _recordingBar.SetPadding(paddingPx, 0, paddingPx, 0);
+        // The drag listener lets Down fall through to onTouchEvent. A
+        // non-clickable LinearLayout declines it there, and Android then stops
+        // sending that gesture's Move events, so the bar could never be dragged.
+        _recordingBar.Clickable = true;
 
         var background = new GradientDrawable();
         background.SetShape(ShapeType.Rectangle);
