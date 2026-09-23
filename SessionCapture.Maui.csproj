@@ -9,7 +9,7 @@
     <PackageId>SessionCapture.Maui</PackageId>
     <Title>SessionCapture.Maui</Title>
     <Description>Reusable MAUI session capture library with overlay-driven screenshots, local storage, and export APIs.</Description>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>SKonteye</Authors>
     <Copyright>Copyright (c) 2026 SKonteye</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
