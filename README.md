@@ -11,6 +11,11 @@ any review UI.
 Built for the gap between "it's broken on my phone" and a reproducible bug
 report.
 
+<img src="https://raw.githubusercontent.com/SKonteye/SessionCapture.Maui/main/docs/demo.gif" width="320" alt="Screen recording on an Android phone: a session is started from the floating button, five pages are captured automatically as the tester navigates, then the session is opened in the built-in review page and exported." />
+
+A full session on an Android phone, at 2× speed:
+[full-speed MP4](https://raw.githubusercontent.com/SKonteye/SessionCapture.Maui/main/docs/demo.mp4).
+
 - **Platforms:** Android 26+ and iOS 15+
 - **Requires:** .NET 10 / .NET MAUI
 - **License:** MIT
@@ -230,5 +235,6 @@ line of integration actually gets you.
 
 Verified on the iOS 26.5 simulator: sessions record, screenshots are written,
 rapid navigation captures every page, and the library survives a root-page
-swap. Android compiles and packages correctly but has not yet been exercised
-on a device or emulator.
+swap. Verified on a Galaxy A03 Core running Android 13: sessions record,
+navigation is captured automatically, the review page replays the steps, and
+the ZIP export is written. That is the only Android device tested so far.
